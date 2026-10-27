@@ -1,0 +1,564 @@
+{
+  "note": "Made-up personas for the demo. Each one mixes patterns from several interviews and doesn't stand for any one person.",
+  "personas": [
+    {
+      "id": "maya",
+      "name": "Maya",
+      "tagline": "Econ junior recruiting for consulting",
+      "about": "AI-forward but not technical, and a regular at OCS. She uses ChatGPT's free plan for almost everything and only wants free tools.",
+      "shows": "A gap at the right moment, the one-card-a-day limit, and coaching on a tool she already has.",
+      "color": "accent",
+      "prefs": {
+        "mainHub": "chatgpt",
+        "freeOnly": true,
+        "selfReported": [],
+        "notForMe": [],
+        "dailyCap": 1
+      },
+      "apps": [
+        {
+          "name": "ChatGPT",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "Microsoft Word",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "zoom.us",
+          "daysSinceUsed": 2
+        },
+        {
+          "name": "Microsoft PowerPoint",
+          "daysSinceUsed": 6
+        }
+      ],
+      "steps": [
+        {
+          "at": "09:30",
+          "type": "calendar",
+          "title": "Coffee chat w/ Yale alum at Bain",
+          "startsAt": "09:45",
+          "click": "setUp",
+          "narration": "Maya has no notetaker and the chat starts in 15 minutes. This is the gap the app is for. Point out the consent note, then click Set it up.",
+          "scene": [
+            {
+              "app": "calendar"
+            },
+            {
+              "app": "word",
+              "title": "Cover letter - Bain.docx",
+              "detail": "coverBain"
+            }
+          ]
+        },
+        {
+          "at": "12:50",
+          "type": "calendar",
+          "title": "ECON group project sync",
+          "startsAt": "13:00",
+          "narration": "Same kind of moment, but Maya has Granola now, so it stays quiet. If she skipped setup, it would have coached her on Zoom's summary instead, and held it for tomorrow.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Cover letter - Bain.docx",
+              "detail": "coverBain"
+            },
+            {
+              "app": "chatgpt",
+              "title": "ChatGPT",
+              "detail": "Explain price elasticity like I'm prepping for a case interview."
+            }
+          ]
+        },
+        {
+          "at": "16:05",
+          "type": "calendar",
+          "title": "ECON group presentation",
+          "startsAt": "16:30",
+          "narration": "Slides are a real gap, but Maya already had today's card. It waits in the menu bar instead of interrupting. Open the menu bar to show it waiting.",
+          "scene": [
+            {
+              "app": "chatgpt",
+              "title": "ChatGPT",
+              "detail": "Explain price elasticity like I'm prepping for a case interview."
+            },
+            {
+              "app": "powerpoint",
+              "title": "ECON group presentation.pptx"
+            }
+          ]
+        },
+        {
+          "at": "19:00",
+          "type": "calendar",
+          "title": "OCS mock interview",
+          "startsAt": "10:00",
+          "startsDay": 1,
+          "narration": "The evening before an interview is a calm moment. Maya already has ChatGPT, so it coaches her on voice mode instead of selling her a new app. It's still over today's limit, so this waits too and replaces the slides card.",
+          "scene": [
+            {
+              "app": "powerpoint",
+              "title": "ECON group presentation.pptx"
+            },
+            {
+              "app": "safari",
+              "title": "OCS",
+              "detail": "ocs"
+            }
+          ]
+        },
+        {
+          "at": "08:00",
+          "day": 1,
+          "type": "nextMorning",
+          "click": "setUp",
+          "narration": "New day. The waiting card shows up at the first calm moment. Click Show me how for the one-minute rundown.",
+          "scene": [
+            {
+              "app": "calendar"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "theo",
+      "name": "Theo",
+      "tagline": "Architecture sophomore who lives in Claude",
+      "about": "Pays for Claude and does most of his thinking there. Uses Figma every day. Won't install another app unless it's clearly worth it, and he turned the daily limit up to three.",
+      "shows": "Coaching on what he already has before anything new, and Not for me sticking.",
+      "color": "gap",
+      "prefs": {
+        "mainHub": "claude",
+        "freeOnly": false,
+        "selfReported": [],
+        "notForMe": [],
+        "dailyCap": 3
+      },
+      "apps": [
+        {
+          "name": "Claude",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "Figma",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "Keynote",
+          "daysSinceUsed": 4
+        }
+      ],
+      "steps": [
+        {
+          "at": "10:20",
+          "type": "appSwitch",
+          "title": "Figma",
+          "bundleID": "com.figma.Desktop",
+          "moment": "design",
+          "switches": 4,
+          "click": "setUp",
+          "narration": "Going back and forth to Figma counts as a design moment. Figma Make is already inside his Figma and he's never used it, so it coaches him instead of selling him something. Click Show me how.",
+          "scene": [
+            {
+              "app": "claude",
+              "title": "Claude",
+              "detail": "Give me three massing options for a library on a corner lot."
+            },
+            {
+              "app": "figma",
+              "title": "Studio review boards"
+            }
+          ]
+        },
+        {
+          "at": "13:30",
+          "type": "calendar",
+          "title": "ARCH 2810 seminar readings",
+          "startsAt": "14:00",
+          "click": "setUp",
+          "narration": "Claude Projects ranks first because Claude is Theo's main app. It's a feature he already pays for.",
+          "scene": [
+            {
+              "app": "figma",
+              "title": "Studio review boards"
+            },
+            {
+              "app": "safari",
+              "title": "Reading",
+              "detail": "article:Le Corbusier, Towards an Architecture (excerpt)"
+            }
+          ]
+        },
+        {
+          "at": "16:40",
+          "type": "calendar",
+          "title": "Studio review presentation",
+          "startsAt": "17:00",
+          "click": "notForMe",
+          "narration": "Slides are a gap and Keynote has no AI drafting, so it suggests Gamma. Theo would rather lay out his own boards. Click Not for me.",
+          "scene": [
+            {
+              "app": "figma",
+              "title": "Studio review boards"
+            },
+            {
+              "app": "keynote",
+              "title": "Studio review.key"
+            }
+          ]
+        },
+        {
+          "at": "18:30",
+          "type": "calendar",
+          "title": "Final review presentation practice",
+          "startsAt": "19:00",
+          "narration": "Another presentation. Theo said slide tools aren't for him, so it stays quiet. That choice sticks.",
+          "scene": [
+            {
+              "app": "keynote",
+              "title": "Final review.key"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ines",
+      "name": "Ines",
+      "tagline": "Sociology senior who's careful about privacy",
+      "about": "Likes doing her own notes and her own writing. Uses Perplexity and Gemini Notebook in the browser. During onboarding she turned off notetakers and writing help.",
+      "shows": "Staying quiet is the point. A careful user gets one card all day.",
+      "color": "warn",
+      "prefs": {
+        "mainHub": "none",
+        "freeOnly": true,
+        "selfReported": [
+          "perplexity",
+          "notebooklm"
+        ],
+        "notForMe": [
+          "meeting-notes",
+          "writing-feedback"
+        ],
+        "dailyCap": 1
+      },
+      "apps": [
+        {
+          "name": "Microsoft Word",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "zoom.us",
+          "daysSinceUsed": 1
+        }
+      ],
+      "steps": [
+        {
+          "at": "10:40",
+          "type": "calendar",
+          "title": "Office hours with Prof. Alvarez",
+          "startsAt": "11:00",
+          "narration": "Quiet. Ines turned off notetakers, and it respects that every time.",
+          "scene": [
+            {
+              "app": "safari",
+              "title": "Perplexity",
+              "detail": "web:perplexity.ai|Perplexity"
+            },
+            {
+              "app": "word",
+              "title": "Thesis - Chapter 3.docx",
+              "detail": "thesis"
+            }
+          ]
+        },
+        {
+          "at": "12:45",
+          "type": "calendar",
+          "title": "SOCY 3410 seminar readings",
+          "startsAt": "13:00",
+          "narration": "Quiet. She told us she already uses Gemini Notebook for readings.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Thesis - Chapter 3.docx",
+              "detail": "thesis"
+            },
+            {
+              "app": "safari",
+              "title": "Gemini Notebook",
+              "detail": "notebook"
+            }
+          ]
+        },
+        {
+          "at": "15:30",
+          "type": "calendar",
+          "title": "Thesis chapter due to advisor",
+          "startsAt": "17:00",
+          "narration": "Quiet. Writing help is switched off.",
+          "scene": [
+            {
+              "app": "safari",
+              "title": "Gemini Notebook",
+              "detail": "notebook"
+            },
+            {
+              "app": "word",
+              "title": "Thesis - Chapter 3.docx",
+              "detail": "thesis"
+            }
+          ]
+        },
+        {
+          "at": "18:30",
+          "type": "calendar",
+          "title": "Dinner w/ roommates",
+          "startsAt": "19:00",
+          "narration": "Quiet. Apple's model reads this as personal, right on the Mac.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Thesis - Chapter 3.docx",
+              "detail": "thesis"
+            }
+          ]
+        },
+        {
+          "at": "20:00",
+          "type": "calendar",
+          "title": "Fellowship interview",
+          "startsAt": "14:00",
+          "startsDay": 1,
+          "click": "setUp",
+          "narration": "Her only card all day: Big Interview, which OCS gives students for free. One useful card beats five ignored ones.",
+          "scene": [
+            {
+              "app": "calendar"
+            },
+            {
+              "app": "word",
+              "title": "Fellowship statement.docx",
+              "detail": "fellowship"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dev",
+      "name": "Dev",
+      "tagline": "Cognitive Science junior who collects tools",
+      "about": "Installs every tool he hears about, then forgets them. Grammarly, Cursor and Notion haven't been opened in two months. Uses Gemini most, and set the daily limit to three.",
+      "shows": "For someone who already has tools, the app is a coach, not a store.",
+      "color": "purple",
+      "prefs": {
+        "mainHub": "gemini",
+        "freeOnly": true,
+        "selfReported": [],
+        "notForMe": [],
+        "dailyCap": 3
+      },
+      "apps": [
+        {
+          "name": "Gemini",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "Visual Studio Code",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "Grammarly Desktop",
+          "daysSinceUsed": 62
+        },
+        {
+          "name": "Cursor",
+          "daysSinceUsed": 70
+        },
+        {
+          "name": "Notion",
+          "daysSinceUsed": 95
+        }
+      ],
+      "steps": [
+        {
+          "at": "11:00",
+          "type": "calendar",
+          "title": "Jane Street cover letter due",
+          "startsAt": "23:59",
+          "click": "setUp",
+          "narration": "Dev already has Grammarly and hasn't opened it in two months. It coaches him on what he owns before suggesting anything new.",
+          "scene": [
+            {
+              "app": "vscode",
+              "title": "analysis.py"
+            },
+            {
+              "app": "word",
+              "title": "Cover letter - Jane Street.docx",
+              "detail": "coverJaneStreet"
+            }
+          ]
+        },
+        {
+          "at": "14:10",
+          "type": "appSwitch",
+          "title": "Visual Studio Code",
+          "bundleID": "com.microsoft.VSCode",
+          "moment": "coding",
+          "switches": 3,
+          "click": "setUp",
+          "narration": "A coding moment. Cursor is on his Mac but unused, so this is another coaching card, not another install. Click Show me how.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Cover letter - Jane Street.docx",
+              "detail": "coverJaneStreet"
+            },
+            {
+              "app": "safari",
+              "title": "pandas",
+              "detail": "web:pandas.pydata.org|pandas documentation"
+            },
+            {
+              "app": "vscode",
+              "title": "analysis.py"
+            }
+          ]
+        },
+        {
+          "at": "16:00",
+          "type": "calendar",
+          "title": "PSYC 2300 midterm",
+          "startsAt": "09:00",
+          "startsDay": 2,
+          "click": "setUp",
+          "narration": "Gemini is Dev's main app, so Guided Learning ranks first among the study tools he already has.",
+          "scene": [
+            {
+              "app": "vscode",
+              "title": "analysis.py"
+            },
+            {
+              "app": "gemini",
+              "title": "Gemini",
+              "detail": "Summarize the key theories for PSYC 2300."
+            },
+            {
+              "app": "safari",
+              "title": "Lecture notes",
+              "detail": "article:PSYC 2300: Memory and attention, lecture notes"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grace",
+      "name": "Grace",
+      "tagline": "First-year who's curious but has nothing set up",
+      "about": "Interested in AI and in recruiting, but no main AI app yet. Her day is packed.",
+      "shows": "Lots of gaps doesn't mean lots of pop-ups. Nothing interrupts a call.",
+      "color": "pink",
+      "prefs": {
+        "mainHub": "none",
+        "freeOnly": true,
+        "selfReported": [],
+        "notForMe": [],
+        "dailyCap": 1
+      },
+      "apps": [
+        {
+          "name": "zoom.us",
+          "daysSinceUsed": 0
+        }
+      ],
+      "steps": [
+        {
+          "at": "09:55",
+          "type": "callStart",
+          "title": "Study group on Zoom",
+          "bundleID": "us.zoom.xos",
+          "narration": "Grace joins a Zoom call. While she's on a call, nothing pops up.",
+          "scene": [
+            {
+              "app": "calendar"
+            }
+          ]
+        },
+        {
+          "at": "10:05",
+          "type": "calendar",
+          "title": "Coffee chat with Lisa, Class of '22",
+          "startsAt": "10:30",
+          "narration": "A real gap, but she's mid-call, so the card waits.",
+          "scene": [
+            {
+              "app": "calendar"
+            },
+            {
+              "app": "zoom",
+              "title": "Study group on Zoom",
+              "detail": "Sam,Priya,Jordan"
+            }
+          ]
+        },
+        {
+          "at": "10:20",
+          "type": "callEnd",
+          "click": "setUp",
+          "narration": "The call ends and the waiting card shows up straight away, ten minutes before the coffee chat."
+        },
+        {
+          "at": "13:40",
+          "type": "calendar",
+          "title": "Goldman Sachs info session",
+          "startsAt": "14:00",
+          "narration": "Covered now if she set up Granola. Otherwise she's had today's card and this waits.",
+          "scene": [
+            {
+              "app": "calendar"
+            },
+            {
+              "app": "safari",
+              "title": "Goldman Sachs",
+              "detail": "web:goldmansachs.com|Goldman Sachs Careers"
+            }
+          ]
+        },
+        {
+          "at": "15:00",
+          "type": "calendar",
+          "title": "BIOL 1010 midterm",
+          "startsAt": "09:00",
+          "startsDay": 2,
+          "narration": "Study tools are a gap too, but one card a day is the limit. This waits.",
+          "scene": [
+            {
+              "app": "safari",
+              "title": "Study guide",
+              "detail": "article:BIOL 1010 study guide"
+            }
+          ]
+        },
+        {
+          "at": "16:30",
+          "type": "calendar",
+          "title": "Writing seminar essay due",
+          "startsAt": "23:59",
+          "narration": "Another gap, another wait. Several gaps today, and Grace saw one card.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Writing seminar essay.docx",
+              "detail": "essay"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

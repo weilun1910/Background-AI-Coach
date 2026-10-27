@@ -1,0 +1,1321 @@
+{
+  "version": "2026-10-16-proto",
+  "publishedAt": "2026-10-16",
+  "note": "Prototype catalog picked by hand. It stands in for the daily cloud catalog. Facts checked on 2026-10-15; see research/external/catalog-fact-check-2026-10-15.md.",
+  "buckets": [
+    {
+      "id": "meeting-notes",
+      "name": "AI meeting notes",
+      "plural": "AI notetakers",
+      "job": "Writes up what was said, so you can pay attention to the person.",
+      "gapLine": "You don't have an AI notetaker set up.",
+      "moments": [
+        "meeting",
+        "networking"
+      ],
+      "symbol": "waveform"
+    },
+    {
+      "id": "interview-practice",
+      "name": "Interview practice",
+      "plural": "interview practice tools",
+      "job": "Lets you rehearse answers out loud and get feedback before the real thing.",
+      "gapLine": "You don't have a way to practice out loud and get feedback.",
+      "moments": [
+        "interview"
+      ],
+      "symbol": "person.wave.2"
+    },
+    {
+      "id": "research",
+      "name": "Reading and research",
+      "plural": "research assistants",
+      "job": "Answers questions about your readings and shows where it found the answer.",
+      "gapLine": "You don't have an AI tool that works from your own readings.",
+      "moments": [
+        "reading",
+        "lecture"
+      ],
+      "symbol": "books.vertical"
+    },
+    {
+      "id": "study",
+      "name": "Study and exam prep",
+      "plural": "study tools",
+      "job": "Turns your notes into practice questions and explains what you got wrong.",
+      "gapLine": "You don't have an AI study tool set up.",
+      "moments": [
+        "exam"
+      ],
+      "symbol": "graduationcap"
+    },
+    {
+      "id": "slides",
+      "name": "Slide drafting",
+      "plural": "slide tools",
+      "job": "Gets you from an outline to a first draft of slides.",
+      "gapLine": "You don't have an AI tool for drafting slides.",
+      "moments": [
+        "presentation"
+      ],
+      "symbol": "rectangle.on.rectangle"
+    },
+    {
+      "id": "writing-feedback",
+      "name": "Writing feedback",
+      "plural": "writing feedback tools",
+      "job": "Reads your draft and tells you what's unclear, without writing it for you.",
+      "gapLine": "You don't have an AI tool giving you feedback on drafts.",
+      "moments": [
+        "writing"
+      ],
+      "symbol": "text.badge.checkmark"
+    },
+    {
+      "id": "design-ai",
+      "name": "Design and AI",
+      "plural": "design connectors",
+      "job": "Lets your AI assistant see and work with your design files.",
+      "gapLine": "Your AI assistant can't see your Figma files yet.",
+      "moments": [
+        "design"
+      ],
+      "symbol": "paintpalette"
+    },
+    {
+      "id": "coding-agent",
+      "name": "AI coding agent",
+      "plural": "coding agents",
+      "job": "Writes and edits code across your project while you review.",
+      "gapLine": "You don't have an AI coding agent set up.",
+      "moments": [
+        "coding"
+      ],
+      "symbol": "chevron.left.forwardslash.chevron.right"
+    }
+  ],
+  "tools": [
+    {
+      "id": "granola",
+      "name": "Granola",
+      "vendor": "Granola",
+      "kind": "app",
+      "symbol": "waveform",
+      "buckets": [
+        "meeting-notes"
+      ],
+      "scores": {
+        "meeting-notes": 0.9
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan keeps 30 days of notes. Paid plans start at $14 a month, and US students can get Business free for 12 months.",
+      "dataAccess": "Your mic and your computer's audio while a note is running, plus your calendar to name the notes. The audio goes to Granola's transcription service and isn't saved.",
+      "consentNote": "Ask before you take AI notes. Some people, including some recruiters, will say no.",
+      "why": "It runs on your Mac and doesn't send a bot into the call, so a coffee chat still feels like a conversation.",
+      "avoidIf": "the other person says no to notes.",
+      "detect": {
+        "appNames": [
+          "Granola"
+        ]
+      },
+      "setup": {
+        "method": "brewCask",
+        "brewCask": "granola",
+        "url": "https://www.granola.ai",
+        "steps": [
+          "Install Granola.",
+          "Sign in with your Google or Microsoft account so it can see your calendar.",
+          "Allow microphone and system audio when macOS asks."
+        ],
+        "minutes": 3
+      },
+      "walkthrough": {
+        "networking": [
+          "Open Granola a minute before the chat. Your event should already be there.",
+          "Ask if it's OK to take notes, then hit Start.",
+          "Jot a word or two when something matters, like a name or a next step. Granola fills in the rest.",
+          "Afterwards, ask Granola's chat to draft a thank-you email that mentions what you talked about."
+        ],
+        "default": [
+          "Open Granola a minute before the meeting. Your event should already be there.",
+          "Hit Start when the meeting begins.",
+          "Type short notes when something matters. Granola merges them with the transcript.",
+          "Afterwards, ask it for the action items and who owns each one."
+        ]
+      },
+      "source": "https://www.granola.ai"
+    },
+    {
+      "id": "notion-ai-notes",
+      "name": "Notion AI Meeting Notes",
+      "vendor": "Notion",
+      "kind": "feature",
+      "symbol": "note.text",
+      "buckets": [
+        "meeting-notes"
+      ],
+      "scores": {
+        "meeting-notes": 0.7
+      },
+      "evidence": "onPaper",
+      "free": false,
+      "cost": "Needs a Notion Business or Enterprise plan. Free and Plus plans, including the free student plan, only get a short trial.",
+      "dataAccess": "Your mic and computer audio during the meeting, saved to your Notion workspace.",
+      "consentNote": "Ask before you take AI notes.",
+      "why": "If your notes already live in Notion, the transcript and summary land right next to them.",
+      "coachLine": "You have Notion. If your workspace is on a Business plan, it can take AI meeting notes.",
+      "detect": {
+        "appNames": [
+          "Notion"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://www.notion.com/product/ai-meeting-notes",
+        "steps": [
+          "Open the Notion desktop app and type /meet on a new page.",
+          "Allow microphone and screen and system audio recording when macOS asks.",
+          "Start the notes when the meeting begins."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "default": [
+          "Make a page for the meeting and type /meet.",
+          "Start the notes when people start talking.",
+          "Afterwards, read the summary and fix anything it got wrong before you share it."
+        ]
+      },
+      "source": "https://www.notion.com/product/ai-meeting-notes"
+    },
+    {
+      "id": "zoom-ai-companion",
+      "notFor": ["networking", "interview"],
+      "name": "Zoom meeting summary",
+      "vendor": "Zoom",
+      "kind": "feature",
+      "symbol": "video",
+      "buckets": [
+        "meeting-notes"
+      ],
+      "scores": {
+        "meeting-notes": 0.65
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free with your Yale Zoom account. Free personal Zoom accounts get summaries for 3 hosted meetings a month.",
+      "dataAccess": "What people say in the meeting, transcribed and summarized by Zoom.",
+      "consentNote": "Everyone in the call sees a lit AI icon at the top right while the summary runs.",
+      "why": "Nothing to install if you already meet on Zoom. It summarizes the call and lists next steps.",
+      "coachLine": "You have Zoom, and it can summarize calls you host. You haven't used it yet.",
+      "detect": {
+        "appNames": [
+          "zoom.us"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://yale.zoom.us/profile/setting",
+        "steps": [
+          "Sign in at yale.zoom.us with your NetID and open Settings.",
+          "Check that meeting summary is on. Yale turns it on by default.",
+          "In your next call that you host, click the AI icon at the top right and choose Start Summary."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "default": [
+          "If you're the host, click the AI icon at the top right and choose Start Summary.",
+          "Let it run for the whole call.",
+          "Check the summary email afterwards and fix the action items before you forward them."
+        ]
+      },
+      "source": "https://ai.yale.edu/yales-ai-tools-and-resources/zoom-ai-companion"
+    },
+    {
+      "id": "otter",
+      "name": "Otter",
+      "vendor": "Otter.ai",
+      "kind": "web",
+      "symbol": "text.bubble",
+      "buckets": [
+        "meeting-notes"
+      ],
+      "scores": {
+        "meeting-notes": 0.6
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan: 300 minutes a month, and each recording stops at 30 minutes.",
+      "dataAccess": "The meeting audio. Its assistant can join your calls as a participant.",
+      "consentNote": "Otter's Notetaker joins as a visible participant, which can feel odd in a 1:1 chat. Yale blocks AI bots like it in Yale Zoom calls.",
+      "why": "Works in the browser on any computer, and the free plan is enough to try it.",
+      "detect": {
+        "appNames": [
+          "Otter"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://otter.ai",
+        "steps": [
+          "Sign up on otter.ai.",
+          "Open it in a browser tab, or in the Otter Mac app, and hit Record when the meeting starts.",
+          "Skip the calendar auto-join for Yale Zoom calls, because Yale blocks the bot."
+        ],
+        "minutes": 3
+      },
+      "walkthrough": {
+        "default": [
+          "Hit Record when the meeting starts.",
+          "Highlight lines that matter while it transcribes.",
+          "Afterwards, share the summary, not the whole transcript."
+        ]
+      },
+      "source": "https://otter.ai"
+    },
+    {
+      "id": "big-interview",
+      "name": "Big Interview",
+      "vendor": "Big Interview, through Yale OCS",
+      "kind": "web",
+      "symbol": "person.wave.2",
+      "buckets": [
+        "interview-practice"
+      ],
+      "scores": {
+        "interview-practice": 0.85
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free for Yale students through the Office of Career Strategies",
+      "dataAccess": "Video and audio of your practice answers, stored in your Big Interview account.",
+      "why": "OCS gives it to Yale students for free. It has question sets by industry and gives feedback on your recorded answers.",
+      "detect": {},
+      "setup": {
+        "method": "openURL",
+        "url": "https://ocs.yale.edu/resources/big-interview/",
+        "steps": [
+          "Open the Big Interview link on the OCS Big Interview page.",
+          "Sign in with your Yale account.",
+          "Pick the question set for the role you're interviewing for."
+        ],
+        "minutes": 3
+      },
+      "walkthrough": {
+        "interview": [
+          "Pick a question set that matches the role.",
+          "Record two or three answers out loud. Don't script them.",
+          "Watch one back and check the feedback on pace and filler words.",
+          "Redo the weakest answer once, then stop. You're warming up, not memorizing."
+        ]
+      },
+      "source": "https://ocs.yale.edu/resources/big-interview/"
+    },
+    {
+      "id": "yoodli",
+      "name": "Yoodli",
+      "vendor": "Yoodli",
+      "kind": "web",
+      "symbol": "mic",
+      "buckets": [
+        "interview-practice"
+      ],
+      "scores": {
+        "interview-practice": 0.75
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free for 5 practice sessions in total. Paid plans start at $8 a month, billed yearly.",
+      "dataAccess": "Your mic and camera while you practice.",
+      "why": "An AI interviewer asks follow-up questions, so it feels closer to a real conversation.",
+      "detect": {},
+      "setup": {
+        "method": "openURL",
+        "url": "https://yoodli.ai",
+        "steps": [
+          "Sign up on yoodli.ai.",
+          "Pick an interview roleplay that matches the role.",
+          "Allow mic and camera in your browser."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "interview": [
+          "Start a roleplay for the role you're interviewing for.",
+          "Answer out loud like it's real.",
+          "Read the feedback on your two longest answers. Long usually means unfocused."
+        ]
+      },
+      "source": "https://yoodli.ai"
+    },
+    {
+      "id": "chatgpt-mock-interview",
+      "name": "Mock interview in ChatGPT voice",
+      "vendor": "OpenAI",
+      "kind": "feature",
+      "hub": "chatgpt",
+      "symbol": "waveform.circle",
+      "buckets": [
+        "interview-practice"
+      ],
+      "scores": {
+        "interview-practice": 0.7
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Works on the free plan, but free voice time is limited.",
+      "dataAccess": "What you say and paste into the chat, sent to OpenAI.",
+      "why": "ChatGPT's voice mode can play the interviewer. Give it the job description and ask it to push back on vague answers.",
+      "coachLine": "You already have ChatGPT. Its voice mode makes a decent mock interviewer.",
+      "detect": {
+        "appNames": [
+          "ChatGPT",
+          "ChatGPT Classic"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://chatgpt.com",
+        "steps": [
+          "Open ChatGPT."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "interview": [
+          "Open ChatGPT and paste in the job description.",
+          "Say: interview me for this role, one question at a time, and push back when I'm vague.",
+          "Click the Voice icon and answer out loud for 15 minutes. On the free plan you may run out of voice time.",
+          "Ask which two answers were weakest and why."
+        ]
+      },
+      "source": "https://help.openai.com/en/articles/20001274-chatgpt-voice"
+    },
+    {
+      "id": "claude-mock-interview",
+      "name": "Mock interview with Claude",
+      "vendor": "Anthropic",
+      "kind": "feature",
+      "hub": "claude",
+      "symbol": "bubble.left.and.bubble.right",
+      "buckets": [
+        "interview-practice"
+      ],
+      "scores": {
+        "interview-practice": 0.65
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Works on the free plan",
+      "dataAccess": "What you type or paste into the chat, sent to Anthropic.",
+      "why": "Claude is good at asking a sharp follow-up when an answer is vague, which is what real interviewers do.",
+      "coachLine": "You already have Claude. It can run a mock interview with follow-up questions.",
+      "detect": {
+        "appNames": [
+          "Claude"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://claude.ai",
+        "steps": [
+          "Open Claude."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "interview": [
+          "Paste in the job description and your resume.",
+          "Say: interview me for this role, one question at a time. Ask a follow-up whenever I'm vague.",
+          "Answer each question the way you'd say it out loud.",
+          "At the end, ask for the one habit that hurt your answers most."
+        ]
+      },
+      "source": "https://claude.ai"
+    },
+    {
+      "id": "gemini-live-interview",
+      "name": "Mock interview in Gemini Live",
+      "vendor": "Google",
+      "kind": "feature",
+      "hub": "gemini",
+      "symbol": "waveform.circle",
+      "buckets": [
+        "interview-practice"
+      ],
+      "scores": {
+        "interview-practice": 0.65
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Works on the free plan",
+      "dataAccess": "What you say in the conversation, sent to Google.",
+      "why": "Gemini Live is a back-and-forth voice conversation, so you can practice answering out loud.",
+      "coachLine": "You already have Gemini. Gemini Live, on your phone or in Chrome, can play the interviewer out loud.",
+      "detect": {
+        "appNames": [
+          "Gemini"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://support.google.com/gemini/answer/16363185",
+        "steps": [
+          "Open the Gemini app on your phone, or click Ask Gemini at the top of Chrome on your Mac."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "interview": [
+          "Start Gemini Live. Tap Live in the phone app, or click Go Live in Gemini in Chrome.",
+          "Tell it the role and ask it to interview you, one question at a time.",
+          "Answer out loud for 15 minutes.",
+          "Ask which answer you should practice again."
+        ]
+      },
+      "source": "https://support.google.com/gemini/answer/15274899"
+    },
+    {
+      "id": "notebooklm",
+      "name": "Gemini Notebook (formerly NotebookLM)",
+      "vendor": "Google",
+      "kind": "web",
+      "symbol": "book.closed",
+      "buckets": [
+        "research",
+        "study"
+      ],
+      "scores": {
+        "research": 0.9,
+        "study": 0.8
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free with a Google account, including your Yale EliApps account.",
+      "dataAccess": "The files and links you upload, stored in your Google account.",
+      "why": "It answers from the sources you give it and cites the exact passage, so it's safer for readings than a general chatbot.",
+      "detect": {},
+      "setup": {
+        "method": "openURL",
+        "url": "https://notebook.google.com",
+        "steps": [
+          "Open Gemini Notebook and sign in with Google. Your Yale account works.",
+          "Make a notebook for this course.",
+          "Upload the readings as PDFs or paste in links."
+        ],
+        "minutes": 3
+      },
+      "walkthrough": {
+        "reading": [
+          "Put this week's readings in one notebook.",
+          "Ask for the main argument of each one in two sentences.",
+          "Click the citations to check it read them right.",
+          "Ask where the readings disagree. That's usually the seminar discussion."
+        ],
+        "lecture": [
+          "Upload the slides or readings for this class.",
+          "Ask for three questions you could raise in section.",
+          "Click the citations so you can point to the page if someone asks."
+        ],
+        "exam": [
+          "Put your lecture notes and readings in one notebook.",
+          "Ask it to make a practice quiz on the topics most likely to come up.",
+          "Take the quiz, then ask why each wrong answer was wrong.",
+          "Make flashcards from the ones you missed."
+        ]
+      },
+      "source": "https://notebook.google.com"
+    },
+    {
+      "id": "perplexity",
+      "name": "Perplexity",
+      "vendor": "Perplexity",
+      "kind": "web",
+      "symbol": "magnifyingglass",
+      "buckets": [
+        "research"
+      ],
+      "scores": {
+        "research": 0.7
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan, Pro costs extra",
+      "dataAccess": "Your questions, sent to Perplexity.",
+      "why": "Good for finding sources fast. Every answer links to where it came from.",
+      "detect": {},
+      "setup": {
+        "method": "openURL",
+        "url": "https://www.perplexity.ai",
+        "steps": [
+          "Open Perplexity in your browser.",
+          "Sign in so it keeps your threads."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "default": [
+          "Ask a specific question, like what changed in a field since a certain year.",
+          "Open two or three of the linked sources yourself.",
+          "Save the good sources into your own notes."
+        ]
+      },
+      "source": "https://www.perplexity.ai"
+    },
+    {
+      "id": "claude-projects",
+      "name": "Claude Projects",
+      "vendor": "Anthropic",
+      "kind": "feature",
+      "hub": "claude",
+      "symbol": "folder",
+      "buckets": [
+        "research"
+      ],
+      "scores": {
+        "research": 0.75
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Works on the free plan, up to 5 projects.",
+      "dataAccess": "The files you add to the project, stored in your Claude account.",
+      "why": "Keep a course's readings in one Project, and every chat about that course can use them.",
+      "coachLine": "You already use Claude. A Project per course keeps your readings ready for every chat.",
+      "detect": {
+        "appNames": [
+          "Claude"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://claude.ai/projects",
+        "steps": [
+          "Open Claude and make a new Project for the course.",
+          "Add the readings as files."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "default": [
+          "Make a Project named after the course.",
+          "Add the syllabus and this week's readings.",
+          "Start chats inside the Project so it uses them.",
+          "Ask it to quote the passage it's relying on, then check it."
+        ]
+      },
+      "source": "https://claude.ai"
+    },
+    {
+      "id": "chatgpt-projects",
+      "name": "ChatGPT Projects",
+      "vendor": "OpenAI",
+      "kind": "feature",
+      "hub": "chatgpt",
+      "symbol": "folder",
+      "buckets": [
+        "research"
+      ],
+      "scores": {
+        "research": 0.7
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Works on the free plan, with fewer files per project than paid plans.",
+      "dataAccess": "The files you add to the project, stored in your ChatGPT account.",
+      "why": "Group a course's readings and chats in one Project so ChatGPT keeps the context.",
+      "coachLine": "You already use ChatGPT. A Project per course keeps your readings ready for every chat.",
+      "detect": {
+        "appNames": [
+          "ChatGPT",
+          "ChatGPT Classic"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://chatgpt.com",
+        "steps": [
+          "Open ChatGPT and make a new Project.",
+          "Add the readings as files."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "default": [
+          "Make a Project named after the course.",
+          "Add the syllabus and this week's readings.",
+          "Ask questions inside the Project so it uses them.",
+          "Ask where in the reading each claim comes from, then check it."
+        ]
+      },
+      "source": "https://help.openai.com/en/articles/10169521-projects-in-chatgpt"
+    },
+    {
+      "id": "gemini-deep-research",
+      "name": "Gemini Deep Research",
+      "vendor": "Google",
+      "kind": "feature",
+      "hub": "gemini",
+      "symbol": "doc.text.magnifyingglass",
+      "buckets": [
+        "research"
+      ],
+      "scores": {
+        "research": 0.65
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Limited use on the free plan",
+      "dataAccess": "Your question, sent to Google. It searches the web, and it can also read files you upload.",
+      "why": "It reads dozens of sources and writes a cited report. Good for background before a seminar.",
+      "coachLine": "You already have Gemini. Deep Research can write you a cited background brief.",
+      "detect": {
+        "appNames": [
+          "Gemini"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://gemini.google.com",
+        "steps": [
+          "Open Gemini and pick Deep Research."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "default": [
+          "Pick Deep Research and ask a focused question.",
+          "Check the research plan before it starts and cut what you don't need.",
+          "Open the three sources it leans on most and read those yourself."
+        ]
+      },
+      "source": "https://gemini.google.com"
+    },
+    {
+      "id": "chatgpt-study-mode",
+      "name": "ChatGPT study mode",
+      "vendor": "OpenAI",
+      "kind": "feature",
+      "hub": "chatgpt",
+      "symbol": "graduationcap",
+      "buckets": [
+        "study"
+      ],
+      "scores": {
+        "study": 0.75
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Works on the free plan",
+      "dataAccess": "What you type or upload, sent to OpenAI.",
+      "why": "Study mode asks you questions instead of handing over answers, which is what actually helps before an exam.",
+      "coachLine": "You already have ChatGPT. Its study mode quizzes you instead of giving answers away.",
+      "detect": {
+        "appNames": [
+          "ChatGPT",
+          "ChatGPT Classic"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://chatgpt.com/studymode",
+        "steps": [
+          "Open ChatGPT in a regular chat, click +, and pick Study. It doesn't work inside Projects."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "exam": [
+          "Turn on study mode and upload the exam topics or your notes.",
+          "Ask it to quiz you, one question at a time.",
+          "When you miss one, ask it to walk you through it with hints, not the answer.",
+          "End by asking which topic to review again tonight."
+        ]
+      },
+      "source": "https://help.openai.com/en/articles/11780217-using-study-mode-in-chatgpt"
+    },
+    {
+      "id": "claude-learning-mode",
+      "name": "Claude learning mode",
+      "vendor": "Anthropic",
+      "kind": "feature",
+      "hub": "claude",
+      "symbol": "graduationcap",
+      "buckets": [
+        "study"
+      ],
+      "scores": {
+        "study": 0.7
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Check your Claude plan",
+      "dataAccess": "What you type or upload, sent to Anthropic.",
+      "why": "Learning mode guides you with questions so you work the problem out yourself.",
+      "coachLine": "You already have Claude. Its learning mode walks you through problems instead of solving them.",
+      "detect": {
+        "appNames": [
+          "Claude"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://claude.ai",
+        "steps": [
+          "Open Claude. If the style menu has Learning, pick it. If not, ask Claude to quiz you and give hints instead of answers."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "exam": [
+          "Pick the Learning style if you see it, then upload your notes.",
+          "Ask it to quiz you on the exam topics.",
+          "When you're stuck, ask for a hint, not the answer."
+        ]
+      },
+      "source": "https://claude.ai"
+    },
+    {
+      "id": "gemini-guided-learning",
+      "name": "Gemini Guided Learning",
+      "vendor": "Google",
+      "kind": "feature",
+      "hub": "gemini",
+      "symbol": "graduationcap",
+      "buckets": [
+        "study"
+      ],
+      "scores": {
+        "study": 0.7
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Works on the free plan",
+      "dataAccess": "What you type or upload, sent to Google.",
+      "why": "Guided Learning breaks a topic into steps and checks your understanding as you go.",
+      "coachLine": "You already have Gemini. Guided Learning can quiz you step by step.",
+      "detect": {
+        "appNames": [
+          "Gemini"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://gemini.google.com",
+        "steps": [
+          "Open gemini.google.com, click +, then More tools, and pick Guided Learning."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "exam": [
+          "Pick Guided Learning and name the exam topic.",
+          "Answer its check-in questions honestly.",
+          "Ask for a short practice set on whatever you got wrong."
+        ]
+      },
+      "source": "https://gemini.google.com"
+    },
+    {
+      "id": "quizlet",
+      "name": "Quizlet",
+      "vendor": "Quizlet",
+      "kind": "web",
+      "symbol": "rectangle.stack",
+      "buckets": [
+        "study"
+      ],
+      "scores": {
+        "study": 0.6
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan with a few AI study guides and practice tests. Quizlet Plus starts at $35.99 a year.",
+      "dataAccess": "The notes you paste in, stored in your Quizlet account.",
+      "why": "Turns your notes into flashcards and practice tests quickly.",
+      "detect": {},
+      "setup": {
+        "method": "openURL",
+        "url": "https://quizlet.com",
+        "steps": [
+          "Sign up on quizlet.com.",
+          "Paste in your notes to make a set."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "exam": [
+          "Paste in your notes and let it make cards.",
+          "Delete cards that are too easy.",
+          "Run a practice test the night before, not five minutes before."
+        ]
+      },
+      "source": "https://quizlet.com"
+    },
+    {
+      "id": "gamma",
+      "name": "Gamma",
+      "vendor": "Gamma",
+      "kind": "web",
+      "symbol": "rectangle.on.rectangle",
+      "buckets": [
+        "slides"
+      ],
+      "scores": {
+        "slides": 0.8
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan with 400 AI credits at sign-up and up to 10 slides per prompt.",
+      "dataAccess": "Your outline and any files you upload.",
+      "why": "Paste an outline and get a full draft deck in a minute. You still fix the content, but the layout work is done.",
+      "detect": {},
+      "setup": {
+        "method": "openURL",
+        "url": "https://gamma.app",
+        "steps": [
+          "Sign up on gamma.app.",
+          "Paste your outline into Gamma's chat and ask for a deck."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "presentation": [
+          "Paste your outline or notes into Gamma.",
+          "Generate, then delete every slide that doesn't earn its place.",
+          "Rewrite each headline as a full sentence that says the point.",
+          "Export to PowerPoint or Google Slides if your group uses those."
+        ]
+      },
+      "source": "https://gamma.app"
+    },
+    {
+      "id": "copilot-powerpoint",
+      "name": "Copilot in PowerPoint",
+      "vendor": "Microsoft",
+      "kind": "feature",
+      "hub": "copilot",
+      "symbol": "rectangle.on.rectangle",
+      "buckets": [
+        "slides"
+      ],
+      "scores": {
+        "slides": 0.7
+      },
+      "evidence": "onPaper",
+      "free": false,
+      "cost": "Needs your own Microsoft 365 Personal, Family or Premium plan, or a paid Copilot license. Yale's free Copilot Chat doesn't work inside PowerPoint.",
+      "dataAccess": "Your slides and any files you point it at, processed by Microsoft.",
+      "why": "Drafts slides inside PowerPoint, so your group can keep editing in the same file.",
+      "coachLine": "You have PowerPoint. If your Microsoft 365 plan includes Copilot, it can draft slides from your outline.",
+      "detect": {
+        "appNames": [
+          "Microsoft PowerPoint"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://support.microsoft.com/en-us/powerpoint/copilot/create-a-new-presentation-with-copilot-in-powerpoint",
+        "steps": [
+          "Open PowerPoint, start a new presentation, and click the Copilot icon at the bottom right of the slide."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "presentation": [
+          "Click Copilot and paste your outline, then ask for a deck.",
+          "Cut slides until each one has a single point.",
+          "Ask Copilot to tighten the speaker notes."
+        ]
+      },
+      "source": "https://support.microsoft.com/en-us/powerpoint/copilot/create-a-new-presentation-with-copilot-in-powerpoint"
+    },
+    {
+      "id": "canva",
+      "name": "Canva",
+      "vendor": "Canva",
+      "kind": "web",
+      "symbol": "paintbrush",
+      "buckets": [
+        "slides"
+      ],
+      "scores": {
+        "slides": 0.65
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan includes up to 20 AI uses. Canva Pro ($144 a year) gives about 10 times more.",
+      "dataAccess": "Your designs and uploads, stored in your Canva account.",
+      "why": "Good-looking templates and AI drafting for decks that need to look polished.",
+      "detect": {},
+      "setup": {
+        "method": "openURL",
+        "url": "https://www.canva.com",
+        "steps": [
+          "Sign up on canva.com.",
+          "On the home page, open Canva AI and pick Presentation."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "presentation": [
+          "Start from a presentation template.",
+          "Use Canva AI to draft a first pass from your outline. Fix the outline before it generates.",
+          "Swap stock photos for your own charts or screenshots."
+        ]
+      },
+      "source": "https://www.canva.com"
+    },
+    {
+      "id": "claude-app",
+      "name": "Claude",
+      "vendor": "Anthropic",
+      "kind": "app",
+      "hub": "claude",
+      "symbol": "text.bubble",
+      "buckets": [
+        "writing-feedback"
+      ],
+      "scores": {
+        "writing-feedback": 0.85
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan, Pro for heavier use",
+      "dataAccess": "Whatever you paste in, sent to Anthropic.",
+      "consentNote": "Career advisors are wary of AI-written cover letters. Ask for feedback and keep the words yours.",
+      "why": "Paste a draft and ask what's unclear or generic. It's good at explaining why a sentence is weak.",
+      "coachLine": "You have Claude, but you haven't opened it lately. It's good at blunt feedback on drafts.",
+      "detect": {
+        "appNames": [
+          "Claude"
+        ]
+      },
+      "setup": {
+        "method": "brewCask",
+        "brewCask": "claude",
+        "url": "https://claude.com/download",
+        "steps": [
+          "Install the Claude app.",
+          "Sign in or make a free account."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "writing": [
+          "Paste your draft and the job posting.",
+          "Ask which sentences could be in anyone's cover letter. Tell it not to rewrite them.",
+          "Fix those yourself with a specific story or number.",
+          "Ask once more for anything that sounds stiff."
+        ]
+      },
+      "source": "https://claude.ai"
+    },
+    {
+      "id": "chatgpt-app",
+      "name": "ChatGPT",
+      "vendor": "OpenAI",
+      "kind": "app",
+      "hub": "chatgpt",
+      "symbol": "text.bubble",
+      "buckets": [
+        "writing-feedback"
+      ],
+      "scores": {
+        "writing-feedback": 0.8
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan, Plus for heavier use",
+      "dataAccess": "Whatever you paste in, sent to OpenAI.",
+      "consentNote": "Career advisors are wary of AI-written cover letters. Ask for feedback and keep the words yours.",
+      "why": "Paste a draft and ask where a reader would lose interest.",
+      "coachLine": "You have ChatGPT, but you haven't opened it lately. It can give you feedback on this draft.",
+      "detect": {
+        "appNames": [
+          "ChatGPT",
+          "ChatGPT Classic"
+        ]
+      },
+      "setup": {
+        "method": "brewCask",
+        "brewCask": "chatgpt",
+        "url": "https://chatgpt.com/download",
+        "steps": [
+          "Install the ChatGPT app.",
+          "Sign in or make a free account."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "writing": [
+          "Paste your draft and the job posting.",
+          "Ask where a recruiter would stop reading, and why.",
+          "Rewrite those parts yourself.",
+          "Ask it to check that every claim has an example behind it."
+        ]
+      },
+      "source": "https://chatgpt.com"
+    },
+    {
+      "id": "grammarly",
+      "name": "Grammarly",
+      "vendor": "Grammarly",
+      "kind": "app",
+      "symbol": "checkmark.circle",
+      "buckets": [
+        "writing-feedback"
+      ],
+      "scores": {
+        "writing-feedback": 0.65
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan with 100 AI prompts a month. Pro adds full-sentence rewrites.",
+      "dataAccess": "Text you type in apps where it's turned on. Turn it off for anything private.",
+      "why": "Catches grammar and tone while you type, in whatever app you're writing in.",
+      "detect": {
+        "appNames": [
+          "Grammarly Desktop",
+          "Grammarly"
+        ]
+      },
+      "setup": {
+        "method": "brewCask",
+        "brewCask": "grammarly-desktop",
+        "url": "https://www.grammarly.com/desktop",
+        "steps": [
+          "Install Grammarly.",
+          "Allow Accessibility access when macOS asks, so it can read what you type."
+        ],
+        "minutes": 3
+      },
+      "walkthrough": {
+        "writing": [
+          "Open your draft. Grammarly underlines what it flags.",
+          "Accept grammar fixes, but be picky about tone suggestions.",
+          "Read the final version out loud once yourself."
+        ]
+      },
+      "source": "https://www.grammarly.com"
+    },
+    {
+      "id": "figma-mcp",
+      "name": "Figma MCP server for Claude Code",
+      "vendor": "Figma",
+      "kind": "claudeMCP",
+      "symbol": "paintpalette",
+      "requires": "claude-code",
+      "buckets": [
+        "design-ai"
+      ],
+      "scores": {
+        "design-ai": 0.8
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free to add. Figma's free plan allows about 20 requests a month. The free Education plan for students allows 200 a day.",
+      "dataAccess": "The Figma files you link, read by Claude Code when you ask.",
+      "why": "Claude can read the real frames, layers and styles instead of guessing from a screenshot.",
+      "detect": {
+        "mcpServers": [
+          "figma",
+          "figma-desktop",
+          "figma-remote-mcp",
+          "figma-dev-mode-mcp-server"
+        ]
+      },
+      "setup": {
+        "method": "claudeMCP",
+        "command": "claude mcp add --scope user --transport http figma https://mcp.figma.com/mcp",
+        "url": "https://help.figma.com/hc/en-us/articles/32132100833559",
+        "steps": [
+          "Add the Figma server to Claude Code.",
+          "In Claude Code, type /mcp, pick figma, choose Authenticate, then click Allow access in the browser.",
+          "Copy a link to a Figma frame and paste it into your prompt."
+        ],
+        "minutes": 3
+      },
+      "walkthrough": {
+        "design": [
+          "Select a frame in Figma and copy its link.",
+          "In Claude Code, paste the link and ask it to build or critique that frame.",
+          "Ask it to use your Figma styles and variables by name."
+        ]
+      },
+      "source": "https://help.figma.com"
+    },
+    {
+      "id": "figma-make",
+      "name": "Figma Make",
+      "vendor": "Figma",
+      "kind": "feature",
+      "symbol": "wand.and.stars",
+      "buckets": [
+        "design-ai"
+      ],
+      "scores": {
+        "design-ai": 0.7
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Included in Figma. The free plan gives 500 AI credits a month, up to 150 a day.",
+      "dataAccess": "The frames and prompts you give it, inside your Figma account.",
+      "why": "Turns a prompt or a frame into a clickable prototype, inside Figma.",
+      "coachLine": "You have Figma, and Figma Make can turn a frame into a working prototype from a prompt.",
+      "detect": {
+        "appNames": [
+          "Figma"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://www.figma.com/make/",
+        "steps": [
+          "Open Figma and start a Make file."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "design": [
+          "Start a Make file and paste in a frame.",
+          "Describe what should happen when someone clicks.",
+          "Test it, then ask for one change at a time."
+        ]
+      },
+      "source": "https://www.figma.com/make/"
+    },
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "vendor": "Anthropic",
+      "kind": "cli",
+      "hub": "claude",
+      "symbol": "terminal",
+      "buckets": [
+        "coding-agent"
+      ],
+      "scores": {
+        "coding-agent": 0.85
+      },
+      "evidence": "onPaper",
+      "free": false,
+      "cost": "Needs a paid Claude plan or API credits",
+      "dataAccess": "The files in the folder you run it in, sent to Anthropic when it works on them.",
+      "why": "Works across your whole project. Good for learning, since you can ask it to explain each change.",
+      "detect": {
+        "commands": [
+          "claude"
+        ]
+      },
+      "setup": {
+        "method": "brewCask",
+        "brewCask": "claude-code",
+        "url": "https://code.claude.com/docs/en/quickstart",
+        "steps": [
+          "Install Claude Code.",
+          "Open Terminal in your project folder and type claude.",
+          "Sign in when it asks."
+        ],
+        "minutes": 3
+      },
+      "walkthrough": {
+        "coding": [
+          "Open Terminal in your project folder and type claude.",
+          "Describe the change you want in plain words.",
+          "Read the diff before you accept it, and ask why when something looks odd."
+        ]
+      },
+      "source": "https://code.claude.com/docs/en/setup"
+    },
+    {
+      "id": "cursor",
+      "name": "Cursor",
+      "vendor": "Anysphere",
+      "kind": "app",
+      "symbol": "cursorarrow.rays",
+      "buckets": [
+        "coding-agent"
+      ],
+      "scores": {
+        "coding-agent": 0.8
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan with limited agent requests. Paid plans run from $8 to $200 a month.",
+      "dataAccess": "The code in the folder you open, sent to Cursor's servers when the AI works on it.",
+      "why": "A code editor with an AI agent built in. Familiar if you've used VS Code.",
+      "coachLine": "You have Cursor, but you haven't opened it lately. Its agent can make this change for you.",
+      "detect": {
+        "appNames": [
+          "Cursor"
+        ]
+      },
+      "setup": {
+        "method": "brewCask",
+        "brewCask": "cursor",
+        "url": "https://cursor.com/download",
+        "steps": [
+          "Install Cursor.",
+          "Open your project folder in it."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "coding": [
+          "Open your project folder.",
+          "Open the agent panel and describe the change.",
+          "Review each file it touched before you accept."
+        ]
+      },
+      "source": "https://cursor.com"
+    },
+    {
+      "id": "codex",
+      "name": "Codex",
+      "vendor": "OpenAI",
+      "kind": "cli",
+      "hub": "chatgpt",
+      "symbol": "terminal",
+      "buckets": [
+        "coding-agent"
+      ],
+      "scores": {
+        "coding-agent": 0.75
+      },
+      "evidence": "onPaper",
+      "free": false,
+      "cost": "The Codex CLI comes with ChatGPT Plus and up. Free and Go plans get lighter Codex use in the ChatGPT desktop app.",
+      "dataAccess": "The files in the folder you run it in, sent to OpenAI when it works on them.",
+      "why": "OpenAI's coding agent. A good fit if you already pay for ChatGPT.",
+      "detect": {
+        "commands": [
+          "codex"
+        ],
+        "appNames": [
+          "Codex"
+        ]
+      },
+      "setup": {
+        "method": "brewCask",
+        "brewCask": "codex",
+        "url": "https://openai.com/codex",
+        "steps": [
+          "Install Codex.",
+          "Open Terminal in your project folder and type codex.",
+          "Sign in with your ChatGPT account."
+        ],
+        "minutes": 3
+      },
+      "walkthrough": {
+        "coding": [
+          "Open Terminal in your project folder and type codex.",
+          "Describe the change in plain words.",
+          "Review the diff before you accept it."
+        ]
+      },
+      "source": "https://openai.com/codex"
+    }
+  ]
+}
