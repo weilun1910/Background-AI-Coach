@@ -1,14 +1,14 @@
 #!/bin/bash
 # Builds the menu-bar app and wraps it in a .app bundle.
 # Build output goes to local disk, outside iCloud Drive:
-#   ~/Library/Developer/AI Tool Recommender
+#   ~/Library/Developer/Background AI Coach
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 CONFIG="${CONFIG:-debug}"
-OUT="${RECOMMENDER_BUILD_DIR:-$HOME/Library/Developer/AI Tool Recommender}"
+OUT="${RECOMMENDER_BUILD_DIR:-$HOME/Library/Developer/Background AI Coach}"
 SCRATCH="$OUT/swiftpm"
-APP="$OUT/AI Tool Recommender.app"
+APP="$OUT/Background AI Coach.app"
 mkdir -p "$OUT"
 
 swift build -c "$CONFIG" --scratch-path "$SCRATCH"

@@ -4,7 +4,6 @@ My solution prototype for the ENAS 3110 Solution / Design milestone, for AI-forw
 
 It's a Mac app that lives in the menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes, a mock interview tomorrow or a deadline tonight. If you don't have a good tool for that moment, it suggests one and walks you through setting it up. If you already own one and haven't been using it, it shows you how in about a minute. If you're already covered, it stays quiet.
 
-The app itself still shows the working name "AI Tool Recommender".
 
 ## How it works
 
@@ -35,7 +34,7 @@ cd Background-AI-Coach
 ./scripts/build-app.sh
 ```
 
-The build goes to `~/Library/Developer/AI Tool Recommender` on your Mac. There are four ways to run it.
+The build goes to `~/Library/Developer/Background AI Coach` on your Mac. There are four ways to run it.
 
 | Command | What you get |
 | --- | --- |
@@ -126,7 +125,7 @@ There are four testing flags. Run them with `RECOMMENDER_DATA_DIR` set to a scra
 For example:
 
 ```bash
-RECOMMENDER_DATA_DIR="$TMPDIR/coach-test" "$HOME/Library/Developer/AI Tool Recommender/AI Tool Recommender.app/Contents/MacOS/Recommender" --selftest
+RECOMMENDER_DATA_DIR="$TMPDIR/coach-test" "$HOME/Library/Developer/Background AI Coach/Background AI Coach.app/Contents/MacOS/Recommender" --selftest
 ```
 
-Build files stay out of the repo, in `~/Library/Developer/AI Tool Recommender`. Set `RECOMMENDER_BUILD_DIR` to use another folder.
+Build files stay out of the repo, in `~/Library/Developer/Background AI Coach`. Set `RECOMMENDER_BUILD_DIR` to use another folder.

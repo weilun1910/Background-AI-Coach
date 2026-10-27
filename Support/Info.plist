@@ -5,9 +5,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>edu.yale.enas3110.recommender</string>
 	<key>CFBundleName</key>
-	<string>AI Tool Recommender</string>
+	<string>Background AI Coach</string>
 	<key>CFBundleDisplayName</key>
-	<string>AI Tool Recommender</string>
+	<string>Background AI Coach</string>
 	<key>CFBundleExecutable</key>
 	<string>Recommender</string>
 	<key>CFBundlePackageType</key>

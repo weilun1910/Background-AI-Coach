@@ -1,7 +1,7 @@
 import Foundation
 
 /// Everything the app saves lives in one folder on this Mac:
-/// ~/Library/Application Support/AI Tool Recommender
+/// ~/Library/Application Support/Background AI Coach
 final class Store {
     let dir: URL
 
@@ -10,10 +10,10 @@ final class Store {
             dir = URL(fileURLWithPath: custom, isDirectory: true)
         } else if AppModel.personaLaunch {
             // The persona demo never writes into your real settings.
-            dir = FileManager.default.temporaryDirectory.appendingPathComponent("AI Tool Recommender Personas", isDirectory: true)
+            dir = FileManager.default.temporaryDirectory.appendingPathComponent("Background AI Coach Personas", isDirectory: true)
         } else {
             dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-                .appendingPathComponent("AI Tool Recommender", isDirectory: true)
+                .appendingPathComponent("Background AI Coach", isDirectory: true)
         }
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     }
