@@ -76,6 +76,18 @@ The five students each show a different part of the product.
 
 The students are made up. Each one mixes patterns from several of our user interviews and doesn't stand for any one person. Their days are in `Resources/personas.json`.
 
+## The web walkthrough
+
+There's also a web version of the full-screen demo, for sending to people who won't build the app. It has the same five students and the same screens, rendered from the real app without the presenter notes. Testers pick the student most like them and step through the day. Each time a card shows up, they choose what they'd do: set it up (or "Show me how"), "Later", or "Not for me". Their picks are listed at the end and can be sent with a Google Form.
+
+```bash
+./scripts/build-web.sh
+```
+
+The site goes to `~/Library/Developer/Background AI Coach/web-dist`. To put it online, log in to Vercel once with `npx vercel login`, then run `npx vercel deploy --prod` from that folder.
+
+The page itself is in `web/`. `index.html`, `style.css` and `app.js` are the page. `captions.json` has what testers read at each step, and `build.py` turns the demo's steps into slides. To connect the form, paste its link and the id of the question that collects the answers into `FEEDBACK_FORM` at the top of `web/app.js`, then build again.
+
 ## What it does today
 
 - Reads calendar event titles and times through macOS Calendar, and turns them into moments with Apple's on-device model or keyword rules.
@@ -86,7 +98,7 @@ The students are made up. Each one mixes patterns from several of our user inter
 - Installs apps with Homebrew, adds the Figma MCP server to Claude Code, or opens the right page, then shows a short walkthrough.
 - Keeps a log of what happened to each card, and notices when you reopen a tool within a week of setting it up.
 - Has onboarding, settings, a pause button and a coverage view in the menu bar.
-- Ships three demos: the full-screen student demo, a side-window version of it, and a demo mode of the real app.
+- Ships three demos: the full-screen student demo, a side-window version of it, and a demo mode of the real app. The full-screen demo also builds into a web walkthrough.
 
 ## Limitations
 
@@ -97,7 +109,7 @@ The students are made up. Each one mixes patterns from several of our user inter
 - Apple's model needs an M1 or later Mac with Apple Intelligence on. Other Macs fall back to keyword rules, which miss titles like "Coffee w/ Yale alum at BCG". Apple's model sometimes misreads a title too, so a few clear keywords like "interview" override it.
 - Tools that need you to sign in, like claude.ai connectors or a Google account, still need you to do that part yourself. In real mode, "Install it for me" really installs apps through Homebrew.
 - It doesn't learn yet. The log stays on your Mac. Sharing results to improve the scores, and suggesting you remove tools you never use, are designed but not built.
-- It isn't signed or notarized for sharing as a download, so each person builds it from source on their own Mac.
+- It isn't signed or notarized for sharing as a download, so each person builds it from source on their own Mac. The web walkthrough is how to show it to anyone else.
 - It has been tested on one Mac, an M4 Pro on macOS 27. A self-test checks the decision flow, and every step of the demos was played through and checked as images.
 - In the demos, the decisions are made live by the real app, but the students, their apps and their calendars are made up.
 
@@ -119,7 +131,7 @@ There are four testing flags. Run them with `RECOMMENDER_DATA_DIR` set to a scra
 
 - `--selftest` prints what the app sees on your Mac, how Apple's model reads 19 sample titles, and what it would decide for each sample moment. It then clicks through the card flow in code and checks 18 things.
 - `--persona-test` plays every student's day and prints each decision.
-- `--stage-test --render <folder>` plays the full-screen demo and saves every step as an image.
+- `--stage-test --render <folder>` plays the full-screen demo and saves every step as an image. Add `--clean` to leave out the presenter notes and key hints, as the web walkthrough does.
 - `--snapshot <folder>` saves every screen of the real app as an image, in light and dark mode.
 
 For example:

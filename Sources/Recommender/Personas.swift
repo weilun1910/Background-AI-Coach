@@ -91,6 +91,8 @@ final class PersonaDemo: ObservableObject {
     /// Midnight of the pretend day. Every step's time is counted from here.
     private var dayStart = Calendar.current.startOfDay(for: Date())
     private var upcomingGeneration = 0
+    /// The latest Coming up refresh, so the stage test can wait for it before rendering.
+    private(set) var upcomingTask: Task<Void, Never>?
 
     init() {
         var loaded: [Persona] = []
@@ -140,6 +142,8 @@ final class PersonaDemo: ObservableObject {
             (name: app.name, lastUsed: app.daysSinceUsed.map { Clock.now.addingTimeInterval(-Double($0) * 86_400) })
         }
         model.enterPersona(prefs: prefs, apps: apps, mcpServers: persona.mcpServers ?? [], commands: persona.commands ?? [])
+        // Clear the last persona's events now; reading the new titles takes a moment.
+        model.upcoming = []
         refreshUpcoming()
     }
 
@@ -271,7 +275,7 @@ final class PersonaDemo: ObservableObject {
         let remaining = persona.steps.enumerated().filter { $0.offset > first - 1 && $0.element.type == .calendar }
         upcomingGeneration += 1
         let generation = upcomingGeneration
-        Task { @MainActor in
+        upcomingTask = Task { @MainActor in
             var items: [UpcomingItem] = []
             for (index, step) in remaining {
                 let title = step.title ?? ""

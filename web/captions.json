@@ -1,0 +1,107 @@
+{
+  "note": "Tester-facing captions for the web walkthrough, one entry per step in personas.json, in the same order. lead shows when the moment starts. outcome shows once the app has acted, or stayed quiet. title, where given, names the moment in the end-of-day summary when the step has no event of its own.",
+  "maya": [
+    {
+      "lead": "Maya's working on a cover letter for Bain. Her calendar says she has a coffee chat with a Bain alum in 15 minutes.",
+      "outcome": "Granola's open and ready before the chat starts."
+    },
+    {
+      "lead": "Lunch is over and Maya has a group project meeting at 1.",
+      "outcome": "Nothing pops up. Maya has a notetaker now, so the coach stays out of the way. The menu bar shows what it noticed."
+    },
+    {
+      "lead": "Maya's group presents at 4:30 and she's still on the slides.",
+      "outcome": "Slides are a real gap for Maya, but she already got a card today. This one waits in the menu bar so it doesn't interrupt her."
+    },
+    {
+      "lead": "It's evening. Maya has an OCS mock interview tomorrow morning.",
+      "outcome": "Maya already has ChatGPT, so the coach wants to show her its voice mode for interview practice. She's still over today's limit, so this waits for tomorrow."
+    },
+    {
+      "lead": "Next morning. The card that waited shows up at the first calm moment.",
+      "outcome": "ChatGPT opens in voice mode, ready for a practice run.",
+      "title": "OCS mock interview, the morning of"
+    }
+  ],
+  "theo": [
+    {
+      "lead": "Theo keeps going back and forth between Claude and Figma.",
+      "outcome": "Figma Make was already inside Theo's Figma. He just hadn't tried it."
+    },
+    {
+      "lead": "Theo has seminar readings to get through before his 2 PM class.",
+      "outcome": "Theo already pays for Claude, so the coach shows him Projects, a part of it he hasn't used."
+    },
+    {
+      "lead": "Studio review presentation at 5. Theo's in Keynote.",
+      "outcome": "Theo would rather lay out his own boards. After Not for me, slide tools won't come up for him again."
+    },
+    {
+      "lead": "Another presentation, this time practice for his final review.",
+      "outcome": "Nothing. Theo said slide tools aren't for him, and that sticks."
+    }
+  ],
+  "ines": [
+    {
+      "lead": "Ines has office hours with her professor at 11.",
+      "outcome": "Quiet. Ines turned off notetakers when she set the app up, and it respects that."
+    },
+    {
+      "lead": "Seminar readings before her 1 PM class.",
+      "outcome": "Quiet again. She already uses Gemini Notebook for readings."
+    },
+    {
+      "lead": "Her thesis chapter is due to her advisor at 5.",
+      "outcome": "Still quiet. She switched off writing help."
+    },
+    {
+      "lead": "Dinner with her roommates at 7.",
+      "outcome": "Apple's model reads this as a personal event, right on her Mac, so nothing happens."
+    },
+    {
+      "lead": "Ines has a fellowship interview tomorrow afternoon.",
+      "outcome": "Big Interview opens. Yale's career office gives it to students for free. That was her only card all day."
+    }
+  ],
+  "dev": [
+    {
+      "lead": "Dev's Jane Street cover letter is due tonight.",
+      "outcome": "Dev installed Grammarly months ago and never opened it. The coach shows him how to use it here before suggesting anything new."
+    },
+    {
+      "lead": "Dev keeps switching back to VS Code.",
+      "outcome": "Cursor's been sitting on his Mac unused. Another quick how-to, and nothing new to install."
+    },
+    {
+      "lead": "Dev has a psych midterm tomorrow at 9.",
+      "outcome": "Gemini is the AI app Dev uses most, so the coach points him to Guided Learning inside it for studying."
+    }
+  ],
+  "grace": [
+    {
+      "lead": "Grace joins her study group on Zoom.",
+      "outcome": ""
+    },
+    {
+      "lead": "Still on the call. She has a coffee chat with an alum at 10:30.",
+      "outcome": "That's a real gap, since Grace has no notetaker. But she's on a call, so the card waits."
+    },
+    {
+      "lead": "The call ends, and the card that waited shows up, ten minutes before the coffee chat.",
+      "outcome": "Granola's ready for the coffee chat.",
+      "title": "Coffee chat with Lisa, Class of '22, right after the call"
+    },
+    {
+      "lead": "Goldman Sachs info session at 2.",
+      "outcome": "She has Granola now, so it stays quiet."
+    },
+    {
+      "lead": "Biology midterm tomorrow morning.",
+      "outcome": "Study tools are a gap too, but she's had her one card today. This waits."
+    },
+    {
+      "lead": "Writing seminar essay due tonight.",
+      "outcome": "Another gap, another wait. Grace had several gaps today and saw one card."
+    }
+  ]
+}

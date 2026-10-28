@@ -56,8 +56,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if args.contains("--stage-test") {
             let dir = args.firstIndex(of: "--render").flatMap { $0 + 1 < args.count ? URL(fileURLWithPath: args[$0 + 1]) : nil }
+            let clean = args.contains("--clean")
             Task { @MainActor in
-                await StageTest.run(renderTo: dir)
+                await StageTest.run(renderTo: dir, clean: clean)
                 NSApp.terminate(nil)
             }
             return

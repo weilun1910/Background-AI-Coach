@@ -1,14 +1,19 @@
 import AppKit
 import SwiftUI
 
-/// `--stage-test [--render <folder>]` plays every persona's full-screen demo
-/// instantly, prints what's on screen after each beat, and can render each
+/// `--stage-test [--render <folder>] [--clean]` plays every persona's full-screen
+/// demo instantly, prints what's on screen after each beat, and can render each
 /// beat to PNG so the stage can be checked without clicking through it.
+/// `--clean` leaves out the presenter notes and key hints, for the web walkthrough.
 @MainActor
 enum StageTest {
-    static func run(renderTo dir: URL?) async {
+    static func run(renderTo dir: URL?, clean: Bool = false) async {
         let director = StageDirector.shared
         director.setInstant(true)
+        if clean {
+            director.captionsOn = false
+            director.hintsOn = false
+        }
         if let dir { try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true) }
         if let error = director.demo.loadError { print(error) }
 
@@ -22,6 +27,7 @@ enum StageTest {
                 let label = director.currentBeatLabel
                 await director.next()
                 // Let background updates (like the menu's Coming up list) land.
+                await director.demo.upcomingTask?.value
                 for _ in 0..<8 { await Task.yield() }
                 let windows = director.windows.map(\.app).joined(separator: ",")
                 print("  \(String(format: "%02d", n)) \(label)  [windows: \(windows)] [card: \(describe(director.model.panel))]\(director.menuOpen ? " [menu open]" : "")\(director.note != nil ? " [notification]" : "")")
