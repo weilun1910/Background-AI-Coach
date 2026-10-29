@@ -86,7 +86,7 @@ There's also a web version of the full-screen demo, for sending to people who wo
 
 The site goes to `~/Library/Developer/Background AI Coach/web-dist`. To put it online, log in to Vercel once with `npx vercel login`, then run `npx vercel deploy --prod` from that folder. If only the page, captions or survey changed, `SKIP_RENDER=1 ./scripts/build-web.sh` reuses the last frames and takes seconds.
 
-To get the answers out, run `./scripts/export-survey.sh`. It downloads every response and writes two spreadsheets to `~/Library/Developer/Background AI Coach/survey-export`: one row per tester, and one row per card pick. Opening the site with `?test=1` at the end of the link saves answers under `tests/` instead, so trial runs stay out of the real results. `./scripts/export-survey.sh tests/` exports those.
+To read the answers, open https://background-ai-coach.vercel.app/results.html and enter the results key. It's the `RESULTS_KEY` environment variable on the Vercel project. To get the answers out as spreadsheets, run `./scripts/export-survey.sh`. It downloads every response and writes two spreadsheets to `~/Library/Developer/Background AI Coach/survey-export`: one row per tester, and one row per card pick. Opening the site with `?test=1` at the end of the link saves answers under `tests/` instead, so trial runs stay out of the real results. `./scripts/export-survey.sh tests/` exports those.
 
 The page is in `web/`:
 
@@ -96,6 +96,7 @@ The page is in `web/`:
 | `captions.json` | What testers read at each step |
 | `survey.json` | The survey questions, and how many students unlock it |
 | `api/submit.js` | The function that saves a response |
+| `results.html`, `results.js`, `api/results.js` | The private results page and the function behind it |
 | `build.py`, `export_responses.py` | Turn the demo's steps into slides, and responses into CSV |
 
 ## What it does today
