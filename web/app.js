@@ -1,15 +1,9 @@
 // The web walkthrough of the full-screen demo. scripts/build-web.sh renders the
 // frames from the real app and writes walkthrough.json; this file only plays them.
+// After a tester has tried enough students, it shows the survey in survey.json
+// and sends the answers, with their card picks, to /api/submit.
 
-// Paste the Google Form here once it exists. answersEntry is the id of the
-// paragraph question that should receive the tester's picks, like
-// "entry.1234567890". The form's "Get pre-filled link" shows it.
-const FEEDBACK_FORM = {
-  url: "",
-  answersEntry: "",
-};
-
-const STORE_KEY = "coach-walkthrough-picks";
+const STORE_KEY = "coach-walkthrough-v2";
 const CHOICES = ["accept", "later", "never"];
 
 // Cards sit in the top right corner and the menu drops down below the menu
@@ -21,23 +15,20 @@ const ZOOMS = {
 
 const app = document.getElementById("app");
 let people = [];
+let survey = null;
 let screen = "home";
 let person = null;
 let index = 0;
 let zoom = null; // null, or { origin, scale }
 let lastOrigin = ZOOMS.card.origin;
-let copied = false;
-let picks = loadPicks(); // { personId: { slideIndex: "accept" | "later" | "never" } }
+let saved = load(); // { picks: { personId: { slideIndex: choice } }, finished: [ids], submitted }
 
 // MARK: Data
 
-fetch("walkthrough.json")
-  .then((response) => {
-    if (!response.ok) throw new Error(response.status);
-    return response.json();
-  })
-  .then((data) => {
-    people = data.personas;
+Promise.all([getJSON("walkthrough.json"), getJSON("survey.json")])
+  .then(([walkthrough, surveyData]) => {
+    people = walkthrough.personas;
+    survey = surveyData;
     const fromLink = people.find((p) => "#" + p.id === location.hash);
     fromLink ? start(fromLink) : render();
   })
@@ -45,25 +36,33 @@ fetch("walkthrough.json")
     app.innerHTML = `<p class="loading">The walkthrough didn't load. Try refreshing the page.</p>`;
   });
 
+function getJSON(path) {
+  return fetch(path).then((response) => {
+    if (!response.ok) throw new Error(response.status);
+    return response.json();
+  });
+}
+
 // A link like .../#theo opens that student's day directly.
 window.addEventListener("hashchange", () => {
   const linked = people.find((p) => "#" + p.id === location.hash);
   linked ? start(linked) : goHome();
 });
 
-function loadPicks() {
+function load() {
+  const empty = { picks: {}, finished: [], submitted: false };
   try {
-    return JSON.parse(localStorage.getItem(STORE_KEY)) || {};
+    return { ...empty, ...JSON.parse(localStorage.getItem(STORE_KEY)) };
   } catch {
-    return {};
+    return empty;
   }
 }
 
-function savePicks() {
+function save() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(picks));
+    localStorage.setItem(STORE_KEY, JSON.stringify(saved));
   } catch {
-    // Private windows can refuse storage. Picks still work for this visit.
+    // Private windows can refuse storage. Everything still works for this visit.
   }
 }
 
@@ -78,10 +77,36 @@ function demoDid(slide, name) {
 }
 
 function pickFor(p, i) {
-  return (picks[p.id] || {})[i];
+  return (saved.picks[p.id] || {})[i];
+}
+
+function surveyOpen() {
+  return !saved.submitted && saved.finished.length >= survey.unlockAfter;
+}
+
+function remaining() {
+  return Math.max(0, survey.unlockAfter - saved.finished.length);
+}
+
+function count(n) {
+  return ["no", "one", "two", "three", "four", "five"][n] ?? String(n);
+}
+
+function plural(n, word) {
+  return `${count(n)} ${word}${n === 1 ? "" : "s"}`;
+}
+
+function cap(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 // MARK: Moving around
+
+function show(next) {
+  screen = next;
+  render();
+  window.scrollTo(0, 0);
+}
 
 function start(p) {
   person = p;
@@ -93,22 +118,18 @@ function start(p) {
 }
 
 function goHome() {
-  screen = "home";
   person = null;
   history.replaceState(null, "", location.pathname + location.search);
-  render();
-  window.scrollTo(0, 0);
+  show("home");
 }
 
 function next() {
   const slide = person.slides[index];
   if (slide.type === "choice" && !pickFor(person, index)) return;
   if (index === person.slides.length - 1) {
-    screen = "summary";
-    copied = false;
-    render();
-    window.scrollTo(0, 0);
-    return;
+    if (!saved.finished.includes(person.id)) saved.finished.push(person.id);
+    save();
+    return show("summary");
   }
   index += 1;
   setZoom();
@@ -123,8 +144,8 @@ function back() {
 }
 
 function choose(choice) {
-  picks[person.id] = { ...(picks[person.id] || {}), [index]: choice };
-  savePicks();
+  saved.picks[person.id] = { ...(saved.picks[person.id] || {}), [index]: choice };
+  save();
   next();
 }
 
@@ -165,20 +186,39 @@ function esc(text) {
 function render() {
   if (screen === "home") renderHome();
   else if (screen === "walk") renderWalk();
-  else renderSummary();
+  else if (screen === "summary") renderSummary();
+  else if (screen === "survey") renderSurvey();
+  else renderThanks();
 }
 
 function renderHome() {
   document.title = "Background AI Coach";
+  const done = saved.finished.length;
+  let status;
+  if (saved.submitted) {
+    status = `<p class="status">Thanks, your answers are in. You're welcome to keep exploring.</p>`;
+  } else if (surveyOpen()) {
+    status = `
+      <div class="status status-ready">
+        <span>You've tried ${plural(done, "student")}. Ready for a few quick questions?</span>
+        <button class="btn btn-primary" id="to-survey">Answer the questions</button>
+      </div>`;
+  } else if (done > 0) {
+    status = `<p class="status">You've tried ${plural(done, "student")}. ${cap(count(remaining()))} more and then there's a short survey.</p>`;
+  } else {
+    status = "";
+  }
+
   app.innerHTML = `
     <main class="home">
       <div class="eyebrow">${sparkle()} Background AI Coach</div>
       <h1>Try a day with Background AI Coach</h1>
       <div class="intro">
         <p>Background AI Coach is a Mac app that lives in your menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes or a midterm tomorrow. If you don't have a good tool for that moment, it suggests one and sets it up. If you already have one you never open, it shows you how to use it. If you're covered, it stays quiet.</p>
-        <p>Here you'll step through one made-up student's day on their Mac. What the app does at each moment was decided by the real app. When a card shows up, pick what you'd actually do if you were them. There's a short form at the end.</p>
+        <p>Here you'll step through made-up students' days on their Mac. What the app does at each moment was decided by the real app. When a card shows up, pick what you'd actually do if you were them. Try ${plural(survey.unlockAfter, "student")}, starting with the one most like you, and then there's a short survey.</p>
       </div>
-      <h2>Pick the student most like you</h2>
+      ${status}
+      <h2>${done ? "Pick another student" : "Pick the student most like you"}</h2>
       <p class="hint">Each day takes about three minutes. It's easier to read on a laptop than a phone.</p>
       <div class="people">
         ${people.map((p) => `
@@ -186,14 +226,15 @@ function renderHome() {
             <span class="name">${esc(p.name)}</span>
             <span class="tagline">${esc(p.tagline)}</span>
             <span class="about">${esc(p.about)}</span>
-            ${picks[p.id] ? `<span class="done">You've done this one</span>` : ""}
+            ${saved.finished.includes(p.id) ? `<span class="done">Done</span>` : ""}
           </button>`).join("")}
       </div>
-      <p class="footnote">Made by Felix Lee for ENAS 3110 at Yale. The students are made up, and each mixes patterns from several of our interviews. Nothing you click here leaves your browser unless you send the form.</p>
+      <p class="footnote">Made by Felix Lee for ENAS 3110 at Yale. The students are made up, and each mixes patterns from several of our interviews. Nothing you click here leaves your browser until you send the survey.</p>
     </main>`;
   app.querySelectorAll(".person").forEach((el) =>
     el.addEventListener("click", () => start(people.find((p) => p.id === el.dataset.id))),
   );
+  app.querySelector("#to-survey")?.addEventListener("click", () => show("survey"));
 }
 
 // The screen stays on the page between slides, so the frame swaps in place and
@@ -293,10 +334,28 @@ function choicePanel(slide) {
 
 function renderSummary() {
   const cards = person.slides.map((s, i) => ({ s, i })).filter(({ s }) => s.type === "choice");
-  const formLink = FEEDBACK_FORM.url && FEEDBACK_FORM.answersEntry
-    ? `${FEEDBACK_FORM.url}${FEEDBACK_FORM.url.includes("?") ? "&" : "?"}usp=pp_url&${FEEDBACK_FORM.answersEntry}=${encodeURIComponent(answersText())}`
-    : FEEDBACK_FORM.url;
   document.title = `${person.name}'s day | Background AI Coach`;
+
+  let actions;
+  if (surveyOpen()) {
+    actions = `
+      <p class="sub">That's ${plural(saved.finished.length, "student")}. Time for a few quick questions.</p>
+      <div class="actions">
+        <button class="btn btn-primary" id="to-survey">Answer the questions</button>
+        <button class="btn btn-secondary" id="again">Try another student first</button>
+      </div>`;
+  } else if (saved.submitted) {
+    actions = `
+      <div class="actions">
+        <button class="btn btn-primary" id="again">Try another student</button>
+      </div>`;
+  } else {
+    actions = `
+      <p class="sub">${cap(plural(remaining(), "more student"))} and then there's a short survey.</p>
+      <div class="actions">
+        <button class="btn btn-primary" id="again">Pick the next student</button>
+      </div>`;
+  }
 
   app.innerHTML = `
     <main class="summary">
@@ -313,36 +372,167 @@ function renderSummary() {
             </li>`;
         }).join("")}
       </ul>
-      <div class="actions">
-        ${formLink ? `<a class="btn btn-primary" href="${esc(formLink)}" target="_blank" rel="noopener">Tell us what you think</a>` : ""}
-        <button class="btn btn-secondary" id="again">Try another student</button>
-        <button class="btn btn-text" id="copy">Copy my answers</button>
-        ${copied ? `<span class="copied">Copied</span>` : ""}
-      </div>
+      ${actions}
     </main>`;
 
   app.querySelector("#again").addEventListener("click", goHome);
-  app.querySelector("#copy").addEventListener("click", copyAnswers);
+  app.querySelector("#to-survey")?.addEventListener("click", () => show("survey"));
 }
 
-// Every pick so far, one line per card, for the form.
-function answersText() {
+// MARK: Survey
+
+function renderSurvey() {
+  document.title = "A few questions | Background AI Coach";
+  app.innerHTML = `
+    <main class="survey">
+      <div class="eyebrow">${sparkle()} Background AI Coach</div>
+      <h1>A few quick questions</h1>
+      <p class="sub">${esc(survey.intro)}</p>
+      <form id="survey" novalidate>
+        ${survey.questions.map(question).join("")}
+        <div class="trap" aria-hidden="true">
+          <label>Leave this empty <input name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <p class="form-error" id="form-error" role="alert"></p>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit" id="send">Send my answers</button>
+          <button class="btn btn-text" type="button" id="back-home">Back to the students</button>
+        </div>
+      </form>
+    </main>`;
+
+  const form = app.querySelector("#survey");
+  form.addEventListener("submit", send);
+  form.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-scale]");
+    if (!option) return;
+    const group = option.closest(".scale");
+    group.querySelectorAll("[data-scale]").forEach((el) => el.setAttribute("aria-pressed", el === option ? "true" : "false"));
+    group.dataset.value = option.dataset.scale;
+    option.closest(".q").classList.remove("missing");
+  });
+  form.addEventListener("change", (event) => event.target.closest(".q")?.classList.remove("missing"));
+  app.querySelector("#back-home").addEventListener("click", goHome);
+}
+
+function question(q) {
+  const req = q.required ? `<span class="req">Required</span>` : "";
+  const head = `<legend class="q-text">${esc(q.text)} ${req}</legend>`;
+  let body = "";
+  if (q.type === "choice" || q.type === "multi") {
+    const kind = q.type === "choice" ? "radio" : "checkbox";
+    body = `<div class="options">${q.options.map((o) => `
+      <label class="option"><input type="${kind}" name="${esc(q.id)}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("")}</div>`;
+  } else if (q.type === "scale") {
+    const steps = [];
+    for (let n = q.min; n <= q.max; n += 1) {
+      steps.push(`<button type="button" class="scale-step" data-scale="${n}" aria-pressed="false">${n}</button>`);
+    }
+    body = `
+      <div class="scale" data-id="${esc(q.id)}">${steps.join("")}</div>
+      <div class="scale-labels"><span>${esc(q.minLabel)}</span><span>${esc(q.maxLabel)}</span></div>`;
+  } else if (q.type === "text" && q.long) {
+    body = `<textarea name="${esc(q.id)}" rows="3" maxlength="2000" placeholder="${esc(q.placeholder || "")}"></textarea>`;
+  } else {
+    const type = q.type === "email" ? "email" : "text";
+    body = `<input type="${type}" name="${esc(q.id)}" maxlength="200" placeholder="${esc(q.placeholder || "")}"${type === "email" ? ' autocomplete="email"' : ""}>`;
+  }
+  return `<fieldset class="q" data-q="${esc(q.id)}">${head}${body}</fieldset>`;
+}
+
+function readAnswers(form) {
+  const answers = {};
+  for (const q of survey.questions) {
+    if (q.type === "scale") {
+      const value = form.querySelector(`.scale[data-id="${q.id}"]`).dataset.value;
+      answers[q.id] = value ? Number(value) : null;
+    } else if (q.type === "multi") {
+      answers[q.id] = [...form.querySelectorAll(`input[name="${q.id}"]:checked`)].map((el) => el.value);
+    } else if (q.type === "choice") {
+      answers[q.id] = form.querySelector(`input[name="${q.id}"]:checked`)?.value ?? null;
+    } else {
+      answers[q.id] = form.querySelector(`[name="${q.id}"]`).value.trim();
+    }
+  }
+  return answers;
+}
+
+function allPicks() {
   return people.flatMap((p) =>
     p.slides
       .map((s, i) => ({ s, i }))
       .filter(({ s, i }) => s.type === "choice" && pickFor(p, i))
-      .map(({ s, i }) => `${p.name} | ${s.title} | ${s.card.kind === "coach" ? "coached" : "suggested"} ${s.card.tool} | picked ${label(pickFor(p, i), s.card)}`),
-  ).join("\n");
+      .map(({ s, i }) => ({
+        student: p.id,
+        moment: s.title,
+        card: `${s.card.kind} ${s.card.tool}`,
+        picked: label(pickFor(p, i), s.card),
+        demo: s.scripted === "never" ? "Not for me" : label("accept", s.card),
+      })),
+  );
 }
 
-async function copyAnswers() {
-  try {
-    await navigator.clipboard.writeText(answersText());
-    copied = true;
-  } catch {
-    window.prompt("Copy your answers:", answersText());
+async function send(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const answers = readAnswers(form);
+  const errorEl = form.querySelector("#form-error");
+
+  const missing = survey.questions.filter((q) => q.required && (answers[q.id] === null || answers[q.id] === ""));
+  form.querySelectorAll(".q").forEach((el) => el.classList.toggle("missing", missing.some((q) => q.id === el.dataset.q)));
+  const emailField = form.querySelector('input[type="email"]');
+  if (missing.length) {
+    errorEl.textContent = missing.length === 1 ? "One question still needs an answer." : `${missing.length} questions still need an answer.`;
+    form.querySelector(".q.missing").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
   }
-  render();
+  if (emailField && emailField.value && !emailField.checkValidity()) {
+    errorEl.textContent = "That email address doesn't look right.";
+    emailField.focus();
+    return;
+  }
+
+  const button = form.querySelector("#send");
+  button.disabled = true;
+  button.textContent = "Sending...";
+  errorEl.textContent = "";
+  // Opening the page with ?test=1 files answers under tests/, away from real ones.
+  const endpoint = new URLSearchParams(location.search).has("test") ? "/api/submit?test=1" : "/api/submit";
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        students: saved.finished,
+        picks: allPicks(),
+        answers,
+        website: form.querySelector('input[name="website"]').value,
+      }),
+    });
+    if (!response.ok) throw new Error(response.status);
+    saved.submitted = true;
+    save();
+    show("thanks");
+  } catch {
+    button.disabled = false;
+    button.textContent = "Send my answers";
+    errorEl.textContent = "That didn't send. Check your connection and try again.";
+  }
+}
+
+function renderThanks() {
+  document.title = "Thanks | Background AI Coach";
+  const left = people.length - saved.finished.length;
+  app.innerHTML = `
+    <main class="summary">
+      <div class="eyebrow">${sparkle()} Background AI Coach</div>
+      <h1>Thanks, that really helps</h1>
+      <p class="sub">Your answers and card picks are in.${left ? ` If you're curious, there ${left === 1 ? "is one student" : `are ${plural(left, "student")}`} you haven't tried.` : ""}</p>
+      <div class="actions">
+        <button class="btn btn-secondary" id="again">Back to the students</button>
+      </div>
+    </main>`;
+  app.querySelector("#again").addEventListener("click", goHome);
 }
 
 function preload() {

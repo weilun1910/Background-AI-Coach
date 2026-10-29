@@ -78,15 +78,25 @@ The students are made up. Each one mixes patterns from several of our user inter
 
 ## The web walkthrough
 
-There's also a web version of the full-screen demo, for sending to people who won't build the app. It has the same five students and the same screens, rendered from the real app without the presenter notes. Testers pick the student most like them and step through the day. Each time a card shows up, they choose what they'd do: set it up (or "Show me how"), "Later", or "Not for me". Their picks are listed at the end and can be sent with a Google Form.
+There's also a web version of the full-screen demo, for sending to people who won't build the app. It's live at https://background-ai-coach.vercel.app. It has the same five students and the same screens, rendered from the real app without the presenter notes. Testers start with the student most like them and step through the day. Each time a card shows up, they choose what they'd do: set it up (or "Show me how"), "Later", or "Not for me". After two students there's a short survey, and their answers and card picks are saved to a private Vercel Blob store on the project.
 
 ```bash
 ./scripts/build-web.sh
 ```
 
-The site goes to `~/Library/Developer/Background AI Coach/web-dist`. To put it online, log in to Vercel once with `npx vercel login`, then run `npx vercel deploy --prod` from that folder.
+The site goes to `~/Library/Developer/Background AI Coach/web-dist`. To put it online, log in to Vercel once with `npx vercel login`, then run `npx vercel deploy --prod` from that folder. If only the page, captions or survey changed, `SKIP_RENDER=1 ./scripts/build-web.sh` reuses the last frames and takes seconds.
 
-The page itself is in `web/`. `index.html`, `style.css` and `app.js` are the page. `captions.json` has what testers read at each step, and `build.py` turns the demo's steps into slides. To connect the form, paste its link and the id of the question that collects the answers into `FEEDBACK_FORM` at the top of `web/app.js`, then build again.
+To get the answers out, run `./scripts/export-survey.sh`. It downloads every response and writes two spreadsheets to `~/Library/Developer/Background AI Coach/survey-export`: one row per tester, and one row per card pick. Opening the site with `?test=1` at the end of the link saves answers under `tests/` instead, so trial runs stay out of the real results. `./scripts/export-survey.sh tests/` exports those.
+
+The page is in `web/`:
+
+| File | What it is |
+| --- | --- |
+| `index.html`, `style.css`, `app.js` | The page |
+| `captions.json` | What testers read at each step |
+| `survey.json` | The survey questions, and how many students unlock it |
+| `api/submit.js` | The function that saves a response |
+| `build.py`, `export_responses.py` | Turn the demo's steps into slides, and responses into CSV |
 
 ## What it does today
 

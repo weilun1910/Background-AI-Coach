@@ -1,0 +1,9 @@
+{
+  "name": "background-ai-coach-walkthrough",
+  "private": true,
+  "type": "module",
+  "description": "The web walkthrough's survey function. The page itself is static.",
+  "dependencies": {
+    "@vercel/blob": "2.8.2"
+  }
+}

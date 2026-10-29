@@ -6,20 +6,28 @@
 #   ~/Library/Developer/Background AI Coach/web-dist
 # To put it online, run this from that folder once you've logged in to Vercel:
 #   npx vercel deploy --prod
+# SKIP_RENDER=1 reuses the last frames, for when only the page, captions or
+# survey changed. WEB_NAME=<name> builds into web-dist-<name> and
+# web-frames-<name> instead, to preview a change without touching the folder
+# that's linked to Vercel.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 OUT="${RECOMMENDER_BUILD_DIR:-$HOME/Library/Developer/Background AI Coach}"
 APP="$OUT/Background AI Coach.app"
-RAW="$OUT/web-frames"
-DATA="$OUT/web-data"
-DIST="$OUT/web-dist"
+SUFFIX="${WEB_NAME:+-$WEB_NAME}"
+RAW="$OUT/web-frames$SUFFIX"
+DATA="$OUT/web-data$SUFFIX"
+DIST="$OUT/web-dist$SUFFIX"
 
-./scripts/build-app.sh
-
-rm -rf "$RAW" "$DATA"
-mkdir -p "$RAW" "$DATA"
-RECOMMENDER_DATA_DIR="$DATA" "$APP/Contents/MacOS/Recommender" --stage-test --render "$RAW" --clean > "$RAW/beats.txt"
+if [ "${SKIP_RENDER:-}" = 1 ] && [ -f "$RAW/beats.txt" ]; then
+  echo "Reusing the frames in $RAW"
+else
+  ./scripts/build-app.sh
+  rm -rf "$RAW" "$DATA"
+  mkdir -p "$RAW" "$DATA"
+  RECOMMENDER_DATA_DIR="$DATA" "$APP/Contents/MacOS/Recommender" --stage-test --render "$RAW" --clean > "$RAW/beats.txt"
+fi
 
 # Keep the Vercel project link (.vercel) between builds and replace the rest.
 mkdir -p "$DIST"
@@ -33,7 +41,9 @@ while read -r frame; do
 done < "$DIST/frames.txt"
 rm "$DIST/frames.txt"
 
-cp web/index.html web/style.css web/app.js "$DIST/"
+cp web/index.html web/style.css web/app.js web/survey.json web/package.json web/results.html web/results.js "$DIST/"
+mkdir -p "$DIST/api"
+cp web/api/submit.js web/api/results.js "$DIST/api/"
 # `vercel link` drops a token into .env.local. Never upload it.
 printf '.env*\n.gitignore\n' > "$DIST/.vercelignore"
 echo "Built $DIST ($(du -sh "$DIST" | cut -f1))"

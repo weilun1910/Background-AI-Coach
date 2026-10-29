@@ -1,0 +1,82 @@
+{
+  "note": "The survey testers see after trying two students (three until Felix lowered it on Oct 28). Drafted by the assistant on Oct 28, 2026, then cut by Felix the same day: the testers are people we already interviewed, so the questions about their own workflow came out, and a question about which use case they'd most want help with went in. Then an optional name went in at the top so answers tie back to each interview, and the email sign-up became a yes or no, since we already know how to reach everyone. Each question has an id (kept stable so answers line up), a type (choice, multi, scale, text or email) and whether it's required. Testers' card picks and which students they tried are sent along automatically.",
+  "unlockAfter": 2,
+  "intro": "Thanks for trying it. This takes a minute or two, and your card picks get sent along with your answers.",
+  "questions": [
+    {
+      "id": "name",
+      "type": "text",
+      "required": false,
+      "text": "What's your name?",
+      "placeholder": "First name is fine"
+    },
+    {
+      "id": "useful",
+      "type": "scale",
+      "required": true,
+      "text": "How useful would this be for you?",
+      "min": 1,
+      "max": 5,
+      "minLabel": "Not useful",
+      "maxLabel": "Very useful"
+    },
+    {
+      "id": "use_case",
+      "type": "choice",
+      "required": true,
+      "text": "What would you most want suggestions and setup help for?",
+      "options": [
+        "Coffee chats and meetings",
+        "Interview prep",
+        "Readings and research",
+        "Studying for exams",
+        "Making slides",
+        "Writing, like cover letters or essays",
+        "Design work",
+        "Coding",
+        "Something else"
+      ]
+    },
+    {
+      "id": "use_case_other",
+      "type": "text",
+      "required": false,
+      "text": "If it's something else, what?"
+    },
+    {
+      "id": "install",
+      "type": "choice",
+      "required": true,
+      "text": "If this were a real Mac app, would you install it and let it read your calendar event titles?",
+      "options": ["Yes", "Probably", "Not sure", "No"]
+    },
+    {
+      "id": "install_why",
+      "type": "text",
+      "required": false,
+      "text": "What's behind that answer?",
+      "long": true
+    },
+    {
+      "id": "ocs",
+      "type": "choice",
+      "required": false,
+      "text": "Would it make a difference if Yale's career office offered it?",
+      "options": ["I'd trust it more", "No difference", "I'd trust it less"]
+    },
+    {
+      "id": "turn_off",
+      "type": "text",
+      "required": false,
+      "text": "What would make you turn it off?",
+      "long": true
+    },
+    {
+      "id": "try_app",
+      "type": "choice",
+      "required": true,
+      "text": "Want to try the real app on your Mac when it's ready?",
+      "options": ["Yes", "No"]
+    }
+  ]
+}
