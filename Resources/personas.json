@@ -127,7 +127,7 @@
       "name": "Theo",
       "tagline": "Architecture sophomore who lives in Claude",
       "about": "Pays for Claude and does most of his thinking there. Uses Figma every day. Won't install another app unless it's clearly worth it, and he turned the daily limit up to three.",
-      "shows": "Coaching on what he already has before anything new, and Not for me sticking.",
+      "shows": "Coaching on tools inside Claude, like a connector and Claude Slides, before anything new, and Not for me sticking.",
       "color": "gap",
       "prefs": {
         "mainHub": "claude",
@@ -159,7 +159,7 @@
           "moment": "design",
           "switches": 4,
           "click": "setUp",
-          "narration": "Going back and forth to Figma counts as a design moment. Figma Make is already inside his Figma and he's never used it, so it coaches him instead of selling him something. Click Show me how.",
+          "narration": "Going back and forth between Claude and Figma counts as a design moment. Claude is his main app, and Figma's connector for Claude lets it read a frame from a link, so it coaches that instead of selling him something. Click Show me how.",
           "scene": [
             {
               "app": "claude",
@@ -197,7 +197,7 @@
           "title": "Studio review presentation",
           "startsAt": "17:00",
           "click": "notForMe",
-          "narration": "Slides are a gap and Keynote has no AI drafting, so it suggests Gamma. Theo would rather lay out his own boards. Click Not for me.",
+          "narration": "Keynote has no AI drafting, but Claude can build a deck he can open in Keynote, so it coaches Claude Slides before suggesting a new app. Theo would rather lay out his own boards. Click Not for me.",
           "scene": [
             {
               "app": "figma",

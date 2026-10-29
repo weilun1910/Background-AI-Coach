@@ -1043,6 +1043,13 @@ struct ChatApp: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(style.accent.opacity(0.1), in: Capsule())
+            } else if let connector = window.flag, connector.hasPrefix("connector:") {
+                Label("\(connector.dropFirst(10)) connector on", systemImage: "link")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(style.accent)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(style.accent.opacity(0.1), in: Capsule())
             }
             Text(window.detail ?? "Hi")
                 .font(.system(size: 14))

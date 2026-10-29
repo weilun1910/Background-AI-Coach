@@ -49,6 +49,12 @@ enum StageContent {
         if flag == "guided" {
             return ["Let's start with what you already know. In one sentence, what's the difference between working memory and long-term memory?"]
         }
+        if flag?.hasPrefix("connector:") == true {
+            return [
+                "Board 2 has three blocks: two side by side and a long bar below them. The two on top use your Massing / Block component, but the bar is detached from it.",
+                "The bar also sits 40 px below the others while your spacing variable is 24 px, so it reads as a separate building. Snap it to the component and the grid and the three will read as one scheme.",
+            ]
+        }
         switch app {
         case "claude":
             return [

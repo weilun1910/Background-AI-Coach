@@ -1,7 +1,7 @@
 {
-  "version": "2026-10-16-proto",
-  "publishedAt": "2026-10-16",
-  "note": "Prototype catalog picked by hand. It stands in for the daily cloud catalog. Facts checked on 2026-10-15; see research/external/catalog-fact-check-2026-10-15.md.",
+  "version": "2026-10-28-proto",
+  "publishedAt": "2026-10-28",
+  "note": "Prototype catalog picked by hand. It stands in for the daily cloud catalog. Facts checked on 2026-10-15; see research/external/catalog-fact-check-2026-10-15.md. Claude Slides and the Figma connector in Claude were added on 2026-10-28; see research/external/claude-skills-connectors-2026-10-28.md.",
   "buckets": [
     {
       "id": "meeting-notes",
@@ -1185,6 +1185,92 @@
         ]
       },
       "source": "https://www.figma.com/make/"
+    },
+    {
+      "id": "claude-figma-connector",
+      "name": "Figma in Claude",
+      "vendor": "Figma",
+      "kind": "feature",
+      "hub": "claude",
+      "symbol": "link",
+      "requires": "figma-make",
+      "buckets": [
+        "design-ai"
+      ],
+      "scores": {
+        "design-ai": 0.75
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free to add on any Claude plan. Figma's free plan allows about 20 requests a month. The free Education plan for students allows 200 a day.",
+      "dataAccess": "The Figma frames you link in a chat, read by Claude when you ask.",
+      "why": "Paste a link to a frame and Claude reads its layout, components and variables instead of working from a screenshot.",
+      "coachLine": "You use Claude and Figma all day. Figma's connector lets Claude read a frame straight from a link.",
+      "detect": {
+        "appNames": [
+          "Claude"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://claude.com/connectors/figma",
+        "steps": [
+          "In Claude, open Customize > Connectors and find Figma.",
+          "Choose Connect to Claude and sign in to Figma.",
+          "In a chat, turn it on from + > Connectors, then paste a frame link."
+        ],
+        "minutes": 2
+      },
+      "walkthrough": {
+        "design": [
+          "In Figma, select a frame and choose Copy link to selection.",
+          "Paste the link into Claude and ask for feedback on that frame.",
+          "Ask which components and styles it's relying on, then check them in Figma."
+        ]
+      },
+      "source": "https://claude.com/connectors/figma"
+    },
+    {
+      "id": "claude-slides",
+      "name": "Claude Slides",
+      "vendor": "Anthropic",
+      "kind": "feature",
+      "hub": "claude",
+      "symbol": "rectangle.stack",
+      "buckets": [
+        "slides"
+      ],
+      "scores": {
+        "slides": 0.7
+      },
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Included on every Claude plan, Free too.",
+      "dataAccess": "The outline and files you give Claude in that chat.",
+      "why": "Ask Claude for a slide deck and it builds one you can edit. Download it as PowerPoint and it opens in Keynote.",
+      "coachLine": "You already use Claude, and it can build an editable deck from your outline.",
+      "detect": {
+        "appNames": [
+          "Claude"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://claude.ai/new",
+        "steps": [
+          "Open Claude and ask for a slide deck, with your outline or notes."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "presentation": [
+          "Paste your outline and ask Claude for a slide deck.",
+          "Ask for one change at a time until each slide says what you mean.",
+          "Download it as PowerPoint and open it in Keynote.",
+          "If charts or shapes need to stay editable, ask for a .pptx file by name."
+        ]
+      },
+      "source": "https://support.claude.com/en/articles/17153992"
     },
     {
       "id": "claude-code",

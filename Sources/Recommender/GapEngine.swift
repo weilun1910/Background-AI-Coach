@@ -51,8 +51,9 @@ struct GapEngine {
                 continue
             case .unused(let ids):
                 // Coach on something they own. Skip paid features if they only want free tools.
+                // A connector needs the app it connects to, like Figma for the Figma connector.
                 let coachable = ids.compactMap { catalog.tool($0) }
-                    .filter { $0.fits(moment.kind) }
+                    .filter { $0.fits(moment.kind) && requirementsMet($0) }
                     .filter { $0.kind == .app || $0.kind == .cli || !prefs.freeOnly || $0.free }
                     .sorted { rank($0, bucket) > rank($1, bucket) }
                 if let tool = coachable.first {

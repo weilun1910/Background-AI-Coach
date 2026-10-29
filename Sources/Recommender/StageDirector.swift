@@ -499,6 +499,8 @@ final class StageDirector: ObservableObject {
             return StageWindow(app: "chatgpt", title: "ChatGPT", detail: "Quiz me on this, one question at a time, and give hints instead of answers.", flag: nil)
         case "claude-projects":
             return StageWindow(app: "claude", title: "Claude", detail: "What's the main argument of each reading, in two sentences? Quote the passage you're relying on.", flag: "project:ARCH 2810 Seminar")
+        case "claude-figma-connector":
+            return StageWindow(app: "claude", title: "Claude", detail: "Here's Board 2: Massing (figma.com/design/...). Which parts of the layout read as unclear?", flag: "connector:Figma")
         case "claude-mock-interview", "claude-learning-mode", "claude-app":
             return StageWindow(app: "claude", title: "Claude", detail: "Here's my draft. Which sentences could be in anyone's cover letter? Don't rewrite them.", flag: nil)
         case "gemini-guided-learning", "gemini-deep-research", "gemini-live-interview":

@@ -69,7 +69,7 @@ The five students each show a different part of the product.
 | Student | Who they are | What their day shows |
 | --- | --- | --- |
 | Maya | Econ junior recruiting for consulting, uses ChatGPT's free plan | Granola suggested before a coffee chat, the one-card-a-day limit holding two later cards, and the held interview card showing up the next morning |
-| Theo | Architecture sophomore who does most of his thinking in Claude | Coaching on Figma Make and Claude Projects before anything new, and "Not for me" sticking for the rest of the day |
+| Theo | Architecture sophomore who does most of his thinking in Claude | Coaching on tools inside Claude before anything new: Figma's connector for Claude, Claude Projects and Claude Slides. Then "Not for me" sticking for the rest of the day |
 | Ines | Sociology senior who's careful about privacy | Four quiet moments in a row, then one card all day for Big Interview, which Yale's career office gives students free |
 | Dev | Cognitive Science junior with tools he never opens | Coaching on Grammarly, Cursor and Gemini that he already has, with no new installs |
 | Grace | First-year with nothing set up | Nothing popping up during a Zoom call, and only one card on a day full of gaps |
