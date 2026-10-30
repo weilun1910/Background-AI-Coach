@@ -88,6 +88,8 @@ The site goes to `~/Library/Developer/Background AI Coach/web-dist`. To put it o
 
 To read the answers, open https://background-ai-coach.vercel.app/results.html and enter the results key. It's the `RESULTS_KEY` environment variable on the Vercel project. To get the answers out as spreadsheets, run `./scripts/export-survey.sh`. It downloads every response and writes two spreadsheets to `~/Library/Developer/Background AI Coach/survey-export`: one row per tester, and one row per card pick. Opening the site with `?test=1` at the end of the link saves answers under `tests/` instead, so trial runs stay out of the real results. `./scripts/export-survey.sh tests/` exports those.
 
+There's also a share link that opens the results with no key, for teammates or anyone else Felix sends it to. It's the results page with a second key after the `#`, and it's saved in `~/Library/Developer/Background AI Coach/survey-export/share-link.txt`. That key is the `RESULTS_SHARE_KEY` environment variable. It only reads the real responses, so the test answers and the Lock button don't show. To cut off everyone who has the link, change `RESULTS_SHARE_KEY` on Vercel and redeploy. The page isn't linked from the walkthrough and tells search engines not to index it.
+
 The page is in `web/`:
 
 | File | What it is |

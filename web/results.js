@@ -2,14 +2,21 @@
 // browser, and reads every response from /api/results. Question wording comes
 // from survey.json and student names from walkthrough.json, so it stays in step
 // with whatever testers saw.
+//
+// The share link carries a second key after the #, like results.html#abc123.
+// Browsers never send that part to a server, so it stays out of logs. With it,
+// the page opens straight to the real responses, keeps nothing in the browser,
+// and hides the test answers and the Lock button.
 
 const KEY_STORE = "coach-results-key";
 const root = document.getElementById("results");
+const shareKey = location.hash.slice(1).trim();
+const sharing = Boolean(shareKey);
 
 let survey = null;
 let students = {};
-let key = readKey();
-let showTests = new URLSearchParams(location.search).has("test");
+let key = sharing ? shareKey : readKey();
+let showTests = !sharing && new URLSearchParams(location.search).has("test");
 let data = null;
 let loadedAt = null;
 
@@ -89,6 +96,10 @@ async function load() {
       headers: { "X-Results-Key": key },
       cache: "no-store",
     });
+    if (response.status === 401 && sharing) {
+      root.innerHTML = `<main class="lock"><div class="eyebrow">${sparkle()} Background AI Coach</div><h1>Survey results</h1><p class="sub">This link doesn't work anymore. Ask Felix for a new one.</p></main>`;
+      return;
+    }
     if (response.status === 401) {
       key = "";
       saveKey("");
@@ -126,8 +137,8 @@ function render(warning = "") {
         <div class="report-actions">
           <button class="btn btn-primary" id="refresh">Refresh</button>
           <button class="btn btn-secondary" id="csv"${n ? "" : " disabled"}>Download CSV</button>
-          <label class="toggle"><input type="checkbox" id="tests"${showTests ? " checked" : ""}> Show test answers</label>
-          <button class="btn btn-text" id="forget">Lock</button>
+          ${sharing ? "" : `<label class="toggle"><input type="checkbox" id="tests"${showTests ? " checked" : ""}> Show test answers</label>
+          <button class="btn btn-text" id="forget">Lock</button>`}
         </div>
       </div>
       ${warning ? `<p class="note">${esc(warning)}</p>` : ""}
@@ -136,6 +147,7 @@ function render(warning = "") {
 
   root.querySelector("#refresh").addEventListener("click", load);
   root.querySelector("#csv").addEventListener("click", () => downloadCSV(responses));
+  if (sharing) return;
   root.querySelector("#tests").addEventListener("change", (event) => {
     showTests = event.target.checked;
     load();

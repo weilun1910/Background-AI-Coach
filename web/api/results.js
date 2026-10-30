@@ -1,12 +1,13 @@
 // Returns every saved survey response, for the private results page.
-// The caller must send the key in an X-Results-Key header. It has to match
-// RESULTS_KEY, an environment variable on the Vercel project. ?test=1 returns
-// the test submissions under tests/ instead of the real ones under responses/.
+// The caller must send a key in an X-Results-Key header. RESULTS_KEY is Felix's
+// own key. RESULTS_SHARE_KEY is the one inside the share link, and it only reads
+// the real responses. Both are environment variables on the Vercel project.
+// ?test=1 returns the test submissions under tests/ instead of the real ones
+// under responses/, and needs RESULTS_KEY.
 import { timingSafeEqual } from "node:crypto";
 import { get, list } from "@vercel/blob";
 
-function keyMatches(given) {
-  const expected = process.env.RESULTS_KEY || "";
+function keyMatches(given, expected = "") {
   const a = Buffer.from(String(given || ""));
   const b = Buffer.from(expected);
   return expected.length > 0 && a.length === b.length && timingSafeEqual(a, b);
@@ -28,9 +29,14 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "GET");
     return res.status(405).json({ error: "Use GET" });
   }
-  if (!keyMatches(req.headers["x-results-key"])) return res.status(401).json({ error: "Wrong key" });
+  const given = req.headers["x-results-key"];
+  const owner = keyMatches(given, process.env.RESULTS_KEY);
+  const shared = !owner && keyMatches(given, process.env.RESULTS_SHARE_KEY);
+  if (!owner && !shared) return res.status(401).json({ error: "Wrong key" });
 
-  const prefix = req.query && req.query.test ? "tests/" : "responses/";
+  const wantsTests = Boolean(req.query && req.query.test);
+  if (wantsTests && !owner) return res.status(403).json({ error: "Test answers need the results key" });
+  const prefix = wantsTests ? "tests/" : "responses/";
   try {
     const blobs = [];
     let cursor;
