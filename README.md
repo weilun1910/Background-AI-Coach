@@ -4,6 +4,8 @@ My solution prototype for the ENAS 3110 Solution / Design milestone, for AI-forw
 
 It's a Mac app that lives in the menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes, a mock interview tomorrow or a deadline tonight. If you don't have a good tool for that moment, it suggests one and walks you through setting it up. If you already own one and haven't been using it, it shows you how in about a minute. If you're already covered, it stays quiet.
 
+If you turn it on, it can also notice how you work. It reads the title of the window you're in and takes an occasional look at the window itself, all on your Mac, and keeps only a short line like "writing a cover letter for McKinsey in Word". From that it spots habits, like pasting paragraphs back and forth between ChatGPT and Word, and suggests a better way to use an app you already have, with a prompt ready to paste. It only suggests a new app when nothing you have can do the job.
+
 
 ## How it works
 
@@ -18,7 +20,21 @@ The app runs the same loop every time something happens on your Mac.
 
 None of this leaves your Mac. Event titles are read by Apple's model on the device, or by keyword rules on Macs without it, and nothing about you is uploaded.
 
-The list of tools is a catalog of 29 tools across the eight areas, written by hand in `Resources/catalog.json`. In the full design a shared service would refresh that list every day. Here it's picked by hand, and its prices, plans and links were checked against vendor pages on Oct 15, 2026.
+### Noticing how you work
+
+This part is off until you turn it on, in onboarding or Settings.
+
+1. With Accessibility allowed, it checks the title of the window in front every few seconds, like "Cover letter - McKinsey.docx". Titles stay in memory for an hour and are never saved.
+2. Once you've stayed in a window for a minute, it reads the window's text. It asks the app for its text through Accessibility first. Only if the app keeps its text to itself, and you've also allowed Screen Recording, does it take a picture of that one window and read it with Apple's on-device text recognition. Apple's on-device model then turns the text into one short line, like "reading a job posting from McKinsey in Safari". The picture and the text are dropped right away. It looks at most 12 times an hour, never at the whole screen.
+3. It never looks at password managers, Messages, Mail or calls, at password fields, at windows whose title mentions banking, health or private browsing, or at any app you add in Settings. Nothing pops up while one of those apps is in front either.
+4. From those labels and your calendar, it looks for six habits: pasting back and forth between an AI chat and a document, reading someone's profile before a coffee chat, reading a job posting for a company you've been writing to, a long stretch on one reading, a slide deck that stays blank, and pasting your resume into a new chat again.
+5. For each habit there are workflows in the catalog, each with steps and a prompt. If your main AI app (or another one you have) can run it, you get a tip card with the prompt filled in on your Mac, like the company's name. If nothing you have can do it, it falls back to suggesting one new app, but at most one new app a week.
+6. Onboarding asks what you're working toward. Workflows for your field rank higher, and some prompts get a line for it, like case questions for consulting.
+7. If you put off or close two cards while you're in an app, cards wait until you've left it. Tips and tools you act on rank higher. Settings shows what it learned, with a button to forget it.
+
+The labels it keeps are deleted after 14 days. You can read and delete them in Settings.
+
+The list of tools is a catalog of 32 tools across the eight areas, plus 6 workflows for the habits, written by hand in `Resources/catalog.json`. In the full design a shared service would refresh that list every day. Here it's picked by hand, and its prices, plans and links were checked against vendor pages on Oct 15, 2026.
 
 The system diagram is on the [FigJam board](https://www.figma.com/board/DanmId5kR63iVwQ1qfaFuu). This prototype covers the "Student Mac" half of it.
 
@@ -55,7 +71,7 @@ Click the screen once so it has focus, then use the keyboard.
 | --- | --- |
 | Right arrow or space | Next step |
 | Left arrow | Back one step |
-| 1 to 5 | Switch student |
+| 1 to 6 | Switch student |
 | R | Restart the day |
 | N | Show or hide the presenter notes at the bottom |
 | H | Show or hide the key hints |
@@ -64,7 +80,7 @@ Click the screen once so it has focus, then use the keyboard.
 
 Each moment in a student's day plays in a few steps. Their desktop appears with whatever they're working on. A calendar notification slides in. Then the app's card appears in the corner, and a cursor clicks through setup or "Show me how" until the tool opens on their desktop. When the app stays quiet or holds a card, the cursor opens the menu-bar menu to show what it noticed and why. The notes at the bottom say what to point out at each step.
 
-The five students each show a different part of the product.
+The six students each show a different part of the product. Rory's day is the only one with screen reading turned on. The first five days run exactly as they did before it was added, so the survey answers from those days still line up.
 
 | Student | Who they are | What their day shows |
 | --- | --- | --- |
@@ -73,6 +89,7 @@ The five students each show a different part of the product.
 | Ines | Sociology senior who's careful about privacy | Four quiet moments in a row, then one card all day for Big Interview, which Yale's career office gives students free |
 | Dev | Cognitive Science junior with tools he never opens | Coaching on Grammarly, Cursor and Gemini that he already has, with no new installs |
 | Grace | First-year with nothing set up | Nothing popping up during a Zoom call, and only one card on a day full of gaps |
+| Rory | Political Science junior recruiting for consulting, pays for ChatGPT Plus | Screen reading: a tip held while Rory is writing in Word, because it learned that from last week, then shown in ChatGPT. A coffee chat prompt written for consulting. Passwords never read. A posting checked against this morning's letter. Three tips and no new apps |
 
 The students are made up. Each one mixes patterns from several of our user interviews and doesn't stand for any one person. Their days are in `Resources/personas.json`.
 
@@ -110,6 +127,11 @@ The page is in `web/`:
 - Shows at most one card a day by default, holds cards during calls and pauses, and brings back cards you pushed to "Later".
 - Installs apps with Homebrew, adds the Figma MCP server to Claude Code, or opens the right page, then shows a short walkthrough.
 - Keeps a log of what happened to each card, and notices when you reopen a tool within a week of setting it up.
+- If you turn it on, reads window titles and takes an occasional look at the front window, through Accessibility text first and a one-window picture only when needed. It keeps one short label per look and never the picture or the text.
+- Skips password managers, messages, mail, calls, password fields, windows whose title mentions banking, health or private browsing, and any app you add.
+- Spots six habits and suggests tips for apps you already have, with a filled-in prompt and a Copy prompt button. It suggests a new app only when nothing you have can do it, at most one a week.
+- Asks your career goals and uses them to rank tips and add a line to some prompts.
+- Learns which apps to stay quiet in, and which kinds of help you use. Settings shows what it learned and lets you reset it.
 - Has onboarding, settings, a pause button and a coverage view in the menu bar.
 - Ships three demos: the full-screen student demo, a side-window version of it, and a demo mode of the real app. The full-screen demo also builds into a web walkthrough.
 
@@ -121,7 +143,12 @@ The page is in `web/`:
 - App-switching detection watches a short list of apps and counts switches. By design it doesn't read window titles or the screen.
 - Apple's model needs an M1 or later Mac with Apple Intelligence on. Other Macs fall back to keyword rules, which miss titles like "Coffee w/ Yale alum at BCG". Apple's model sometimes misreads a title too, so a few clear keywords like "interview" override it.
 - Tools that need you to sign in, like claude.ai connectors or a Google account, still need you to do that part yourself. In real mode, "Install it for me" really installs apps through Homebrew.
-- It doesn't learn yet. The log stays on your Mac. Sharing results to improve the scores, and suggesting you remove tools you never use, are designed but not built.
+- It learns only from your own log, and only simple things: which apps to stay quiet in, and which tips and tools you act on. Sharing results to improve everyone's scores, and suggesting you remove tools you never use, are designed but not built.
+- Screen reading has only been run on pictures of the demo's pretend windows. Turning it on for real needs you to allow Accessibility (and, if you want, Screen Recording) in System Settings, and that hasn't been tried on a real Mac yet.
+- While Screen Recording is allowed, macOS reminds you every so often that the app can see your screen. That's why it reads text through Accessibility first.
+- It can't always tell a private browsing window apart. Safari doesn't say so in the window title, so a private Safari window is only skipped if its title gives it away.
+- The six habits are simple rules. They need a stretch of time or more than one moment, so they miss a lot, and some habits will be read wrong.
+- The workflows were written by hand on Oct 30, 2026, and the settings names in them were checked that day. Gemini's saved instructions only work with a personal Google account, not a Yale one.
 - It isn't signed or notarized for sharing as a download, so each person builds it from source on their own Mac. The web walkthrough is how to show it to anyone else.
 - It has been tested on one Mac, an M4 Pro on macOS 27. A self-test checks the decision flow, and every step of the demos was played through and checked as images.
 - In the demos, the decisions are made live by the real app, but the students, their apps and their calendars are made up.
@@ -139,10 +166,13 @@ The code is a Swift package in `Sources/Recommender`. The main pieces are:
 | `PanelViews.swift`, `MenuView.swift`, `OnboardingView.swift`, `SettingsViews.swift` | The card, menu, onboarding and settings |
 | `Personas.swift`, `PersonaViews.swift` | The pretend students and the side-window demo |
 | `StageDirector.swift`, `StageView.swift`, `StageWindows.swift` | The full-screen demo |
+| `ScreenSensing.swift` | Window titles, window text, the one-window picture, text recognition and the activity reader |
+| `Behavior.swift` | Habits, workflows, careers, the never-read list, the journal and what it learned |
+| `ScreenViews.swift` | The career, screen reading, never-read and journal controls |
 
 There are four testing flags. Run them with `RECOMMENDER_DATA_DIR` set to a scratch folder so your real settings aren't touched.
 
-- `--selftest` prints what the app sees on your Mac, how Apple's model reads 19 sample titles, and what it would decide for each sample moment. It then clicks through the card flow in code and checks 18 things.
+- `--selftest` prints what the app sees on your Mac, how Apple's model reads 19 sample titles, and what it would decide for each sample moment. It then clicks through the card flow in code, and runs the screen pipeline on pictures of the demo's windows. It checks 44 things.
 - `--persona-test` plays every student's day and prints each decision.
 - `--stage-test --render <folder>` plays the full-screen demo and saves every step as an image. Add `--clean` to leave out the presenter notes and key hints, as the web walkthrough does.
 - `--snapshot <folder>` saves every screen of the real app as an image, in light and dark mode.
