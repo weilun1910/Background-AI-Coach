@@ -296,7 +296,7 @@ enum Snapshots {
         model.addActivity(symbol: "checklist", title: "\u{201C}ECON 1150 midterm\u{201D}", detail: "Read as an exam by Apple's on-device model. Stayed quiet. You already use Gemini Notebook for this.")
         render(MenuContentView(model: model), width: 360, to: dir.appendingPathComponent("menu.png"))
         render(MenuContentView(model: model), width: 360, dark: true, to: dir.appendingPathComponent("menu-dark.png"))
-        render(SettingsView(model: model), width: 520, height: 1900, to: dir.appendingPathComponent("settings.png"))
+        render(SettingsView(model: model), width: 520, height: 3400, to: dir.appendingPathComponent("settings.png"))
         for page in 0..<OnboardingView.pageCount {
             render(OnboardingView(model: model, startPage: page, close: {}), width: 580, height: 600, to: dir.appendingPathComponent("onboarding-\(page).png"))
         }
