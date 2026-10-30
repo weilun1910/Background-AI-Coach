@@ -35,6 +35,16 @@ enum StageOverlay: Equatable {
     case end
 }
 
+/// What the app is doing with the front window, drawn over it.
+enum LookState: Equatable {
+    /// Taking a look, on the Mac.
+    case looking(String)
+    /// It looked and kept only this label.
+    case kept(String)
+    /// It didn't look, and why.
+    case skipped(String)
+}
+
 /// Where the pretend cursor points: a fixed spot, or a named control.
 enum CursorSpot: Equatable {
     case point(CGPoint)
@@ -72,6 +82,7 @@ final class StageDirector: ObservableObject {
     @Published var caption: String?
     @Published var dockAdded: [String] = []
     @Published var bouncing: String?
+    @Published var look: LookState?
     @Published private(set) var beatIndex = 0
     @Published private(set) var busy = false
     @Published private(set) var results: [StepOutcome] = []
@@ -98,6 +109,7 @@ final class StageDirector: ObservableObject {
         caption = nil
         dockAdded = []
         bouncing = nil
+        look = nil
         cursor = .point(Self.restPoint)
         cursorPressed = false
         results = []
@@ -176,6 +188,49 @@ final class StageDirector: ObservableObject {
             return [Beat(label: "leave call") { d in await d.endCall(step, index) }]
         case .nextMorning:
             return [Beat(label: "next morning") { d in await d.nextMorning(step, index) }]
+        case .screen:
+            var beats = [Beat(label: "scene") { d in await d.setScene(step, index) }]
+            if (step.switches ?? 0) > 0 {
+                beats.append(Beat(label: "switching") { d in await d.switchApps(step) })
+            }
+            if step.glimpse == true {
+                beats.append(Beat(label: "glimpse") { d in d.startLook(step) })
+            }
+            beats.append(Beat(label: "react") { d in await d.reactToScreen(step, index) })
+            return beats
+        }
+    }
+
+    private func startLook(_ step: PersonaStep) {
+        let front = demo.frontApp(step, windows: windows)
+        let title = windows.last?.title ?? ""
+        withAnimation(anim(.easeOut(duration: 0.3))) {
+            if let reason = NeverRead.reason(bundleID: front.bundleID, app: front.name, title: title, extra: model.prefs.neverRead) {
+                look = .skipped("Not looking: \(reason).")
+            } else {
+                look = .looking("Taking a look at this window, on this Mac")
+            }
+        }
+    }
+
+    private func reactToScreen(_ step: PersonaStep, _ index: Int) async {
+        // The real app does the work: the switching check, then the look.
+        demo.recordSwitching(step, windows: windows)
+        let result = await demo.playScreen(step, windows: windows)
+        if case .skipped = result {} else if step.glimpse == true, let label = model.lastLook?.text {
+            withAnimation(anim(.easeOut(duration: 0.25))) { look = .kept("Kept \u{201C}\(label)\u{201D}. The picture is gone.") }
+        }
+        await wait(0.4)
+        caption = step.narration
+        switch result {
+        case .handled(let r):
+            followUp(r, step)
+        case .skipped:
+            results.append(StepOutcome(text: "Didn't look", tone: .quiet))
+            insertNext(peekBeats())
+        case .nothing:
+            results.append(StepOutcome(text: "Quiet", tone: .quiet))
+            insertNext(peekBeats())
         }
     }
 
@@ -187,6 +242,7 @@ final class StageDirector: ObservableObject {
             note = nil
             menuOpen = false
             caption = nil
+            look = nil
             if let scene = step.scene { windows = scene.map(Self.window) }
         }
         await moveCursor(to: Self.restPoint)
@@ -238,7 +294,8 @@ final class StageDirector: ObservableObject {
             await click()
             withAnimation(anim(.easeInOut(duration: 0.25))) { bringToFront(target) }
         }
-        model.setFrontmost(step.bundleID)
+        // On screen steps the real app hears about the switch in the react beat.
+        if step.type != .screen { model.setFrontmost(step.bundleID) }
         await moveCursor(to: Self.restPoint)
     }
 
@@ -336,6 +393,16 @@ final class StageDirector: ObservableObject {
     /// The cursor clicks what the presenter is meant to click on the card.
     private func clickBeats(_ s: Suggestion, _ click: PresenterClick?) -> [Beat] {
         switch click ?? .close {
+        case .setUp where s.kind == .tip:
+            return [
+                Beat(label: "click Show me") { d in
+                    withAnimation(d.anim(.easeOut(duration: 0.2))) { d.look = nil }
+                    await d.press("card-primary") { d.model.accept(s) }
+                },
+                Beat(label: "copy prompt") { d in await d.press("prompt-copy") { d.model.copyPrompt(s) } },
+                Beat(label: "got it") { d in await d.press("walkthrough-done") { d.model.finishWalkthrough(s) } },
+                Beat(label: "open the tool") { d in await d.openTool(s) },
+            ]
         case .setUp where s.kind == .setUp:
             return [
                 Beat(label: "click Set it up") { d in await d.press("card-primary") { d.model.accept(s) } },
@@ -490,6 +557,10 @@ final class StageDirector: ObservableObject {
 
     /// What opens on the desktop once a suggestion is set up or coached.
     static func toolWindow(for s: Suggestion) -> StageWindow {
+        if s.kind == .tip, let workflow = s.workflow {
+            let app = s.tool.hub ?? "chatgpt"
+            return StageWindow(app: app, title: StageApps.info(app).name, detail: StageContent.tipMessage(workflow.id, prompt: s.prompt ?? ""), flag: "tip:\(workflow.id)")
+        }
         switch s.tool.id {
         case "granola":
             return StageWindow(app: "granola", title: "Granola", detail: s.moment.title, flag: "live")
@@ -551,6 +622,7 @@ enum StageApps {
         case "gemini": return StageAppInfo(name: "Gemini", bundleIDs: ["com.google.GeminiMacOS"], symbol: "sparkle", tint: Color(red: 0.26, green: 0.45, blue: 0.95))
         case "grammarly": return StageAppInfo(name: "Grammarly", bundleIDs: [], symbol: "checkmark.circle.fill", tint: Color(red: 0.08, green: 0.6, blue: 0.45))
         case "notion": return StageAppInfo(name: "Notion", bundleIDs: ["notion.id"], symbol: "n.square", tint: .black)
+        case "passwords": return StageAppInfo(name: "Passwords", bundleIDs: ["com.apple.Passwords"], symbol: "key.fill", tint: Color(red: 0.2, green: 0.6, blue: 0.35))
         default: return StageAppInfo(name: key, bundleIDs: [], symbol: "app", tint: .gray)
         }
     }
@@ -600,6 +672,7 @@ enum StageApps {
         case "safari": return CGRect(x: 300, y: 66, width: 890, height: 680)
         case "granola": return CGRect(x: 300, y: 84, width: 780, height: 620)
         case "chatgpt", "claude", "gemini": return CGRect(x: 230, y: 62, width: 840, height: 670)
+        case "passwords": return CGRect(x: 360, y: 110, width: 720, height: 520)
         default: return CGRect(x: 200, y: 80, width: 800, height: 600)
         }
     }
@@ -677,7 +750,7 @@ final class StageController {
         }
         guard let key = event.charactersIgnoringModifiers?.lowercased() else { return false }
         switch key {
-        case "1", "2", "3", "4", "5":
+        case "1", "2", "3", "4", "5", "6", "7", "8", "9":
             if let n = Int(key), !director.busy { director.load(n - 1) }
         case "n":
             director.captionsOn.toggle()

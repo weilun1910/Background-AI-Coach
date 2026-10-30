@@ -12,6 +12,7 @@ struct MenuContentView: View {
             }
             if let pending = model.pending { pendingRow(pending) }
             comingUp
+            if !model.learned.lines.isEmpty { learnedSection }
             coverage
             noticed
             footer
@@ -46,8 +47,8 @@ struct MenuContentView: View {
         HStack(spacing: 10) {
             ToolIcon(symbol: s.tool.symbol, image: model.appIcon(for: s.tool), size: 28)
             VStack(alignment: .leading, spacing: 1) {
-                Text("A suggestion is waiting").font(.callout.weight(.medium))
-                Text("\(s.tool.name) for \(s.moment.kind.phrase)").font(.caption).foregroundStyle(.secondary)
+                Text(s.kind == .tip ? "A tip is waiting" : "A suggestion is waiting").font(.callout.weight(.medium))
+                Text(s.workflow.map { "\($0.name), in \(s.tool.name)" } ?? "\(s.tool.name) for \(s.moment.kind.phrase)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
             Spacer()
             Button("Show") { model.present(s) }
@@ -100,6 +101,15 @@ struct MenuContentView: View {
             }
             Spacer()
             if let state = model.primaryState(for: item.kind) { StateChip(state: state) }
+        }
+    }
+
+    private var learnedSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionLabel("What I've learned")
+            ForEach(model.learned.lines, id: \.self) { line in
+                InfoLine(symbol: "sparkles", text: line, color: Theme.accent)
+            }
         }
     }
 

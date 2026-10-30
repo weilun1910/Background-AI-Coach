@@ -275,6 +275,15 @@ enum Snapshots {
             states.append(("figma-setup", .setup(s)))
         }
         states.append(("quiet", .quiet(title: "\u{201C}Coffee chat w/ Priya (Goldman Sachs)\u{201D}", reason: "You already use Granola for this.")))
+        let savedPrefs = model.prefs
+        model.prefs.mainHub = "chatgpt"
+        model.prefs.careers = ["consulting"]
+        let match = HabitMatch(habit: .postingAfterDraft, noticed: "You're reading the McKinsey posting, and you worked on your McKinsey cover letter this morning.", organization: "McKinsey & Company", topic: "cover letter", key: "snap")
+        let tipMoment = Moment(id: "snap", kind: .writing, source: .screen, title: match.noticed, startDate: nil, detectedBy: .habitRules, context: match.noticed)
+        if case .suggest(let tip) = model.engine.decide(habit: match, moment: tipMoment, how: "From a look at this window, read on this Mac. Only a short label was kept.") {
+            states += [("tip", .card(tip)), ("tip-walkthrough", .walkthrough(tip))]
+        }
+        model.prefs = savedPrefs
 
         for (name, state) in states {
             model.panel = state
@@ -291,6 +300,21 @@ enum Snapshots {
         for page in 0..<OnboardingView.pageCount {
             render(OnboardingView(model: model, startPage: page, close: {}), width: 580, height: 600, to: dir.appendingPathComponent("onboarding-\(page).png"))
         }
+    }
+
+    /// A picture of a view, kept in memory. The demo uses it as a pretend
+    /// screen capture of a window.
+    static func image<V: View>(_ view: V, width: CGFloat, height: CGFloat) -> CGImage? {
+        let host = NSHostingView(rootView: view.frame(width: width, height: height).environment(\.colorScheme, .light))
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: width, height: height), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.appearance = NSAppearance(named: .aqua)
+        window.contentView = host
+        host.frame = NSRect(x: 0, y: 0, width: width, height: height)
+        host.layoutSubtreeIfNeeded()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return nil }
+        host.cacheDisplay(in: host.bounds, to: rep)
+        return rep.cgImage
     }
 
     static func render<V: View>(_ view: V, width: CGFloat, height: CGFloat? = nil, dark: Bool = false, to url: URL) {

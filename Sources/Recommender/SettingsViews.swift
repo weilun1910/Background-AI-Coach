@@ -78,6 +78,15 @@ struct SettingsView: View {
             }
 
             Section {
+                CareerPicker(model: model)
+                Toggle("I'm recruiting right now", isOn: $model.prefs.recruitingNow)
+            } header: {
+                Text("Career goals")
+            } footer: {
+                Text("Tips and tools for these rank higher, and some prompts have a version for your field. This stays on this Mac.")
+            }
+
+            Section {
                 ForEach(model.selfReportableTools) { tool in
                     Toggle(isOn: model.membership(\.selfReported, tool.id)) {
                         VStack(alignment: .leading, spacing: 1) {
@@ -109,6 +118,14 @@ struct SettingsView: View {
 
             Section("Suggestions") {
                 Stepper("At most \(model.prefs.dailyCap) a day", value: $model.prefs.dailyCap, in: 1...5)
+                Stepper(model.prefs.newToolsPerWeek == 0 ? "No limit on new apps" : "At most \(model.prefs.newToolsPerWeek) new app\(model.prefs.newToolsPerWeek == 1 ? "" : "s") a week", value: $model.prefs.newToolsPerWeek, in: 0...5)
+                ForEach(model.prefs.notForMeWorkflows.sorted(), id: \.self) { id in
+                    HStack {
+                        Text("Not for me: \(model.catalog.workflow(id)?.name ?? id)")
+                        Spacer()
+                        Button("Bring back") { model.prefs.notForMeWorkflows.remove(id) }
+                    }
+                }
                 HStack {
                     Text(model.isPaused ? "Paused" : "Active")
                     Spacer()
@@ -142,7 +159,27 @@ struct SettingsView: View {
             }
 
             Section {
-                Text("Your calendar, your apps and your answers here stay on this Mac. I only download a public list of tools. Nothing about you is uploaded.")
+                ScreenSignalRows(model: model)
+            } header: {
+                Text("How you work")
+            } footer: {
+                Text("Both are off until you turn them on. They let me notice habits, like pasting between ChatGPT and Word, and suggest a better way to use apps you already have.")
+            }
+
+            Section("Never read") {
+                NeverReadEditor(model: model)
+            }
+
+            Section("What I've learned") {
+                LearnedList(model: model)
+            }
+
+            Section("What I kept from your screen") {
+                JournalList(model: model)
+            }
+
+            Section {
+                Text("Your calendar, your apps, the labels from your screen and your answers here stay on this Mac. I only download a public list of tools. Nothing about you is uploaded.")
                     .font(.callout)
                 HStack {
                     Button("Show my data in Finder") {
@@ -162,7 +199,7 @@ struct SettingsView: View {
             } header: {
                 Text("Demo")
             } footer: {
-                Text("Catalog \(model.catalog.version), \(model.catalog.buckets.count) buckets and \(model.catalog.tools.count) tools.")
+                Text("Catalog \(model.catalog.version), \(model.catalog.buckets.count) buckets, \(model.catalog.tools.count) tools and \(model.catalog.workflows?.count ?? 0) workflows.")
             }
         }
         .formStyle(.grouped)

@@ -50,6 +50,14 @@ struct StageView: View {
                     .transition(.scale(scale: 0.94).combined(with: .opacity))
             }
 
+            if let look = director.look, let front = director.windows.last {
+                LookOverlay(look: look)
+                    .frame(width: front.frame.width, height: front.frame.height)
+                    .offset(x: front.frame.minX, y: front.frame.minY)
+                    .transition(.opacity)
+                    .allowsHitTesting(false)
+            }
+
             DockView(director: director)
                 .frame(width: StageDirector.canvas.width, alignment: .center)
                 .offset(y: StageDirector.canvas.height - 84)
@@ -135,6 +143,7 @@ enum PersonaColors {
         case "warn": return Theme.warn
         case "purple": return Color(red: 0.49, green: 0.33, blue: 0.82)
         case "pink": return Color(red: 0.84, green: 0.29, blue: 0.53)
+        case "teal": return Color(red: 0.05, green: 0.55, blue: 0.58)
         default: return Theme.accent
         }
     }
@@ -282,7 +291,7 @@ struct KeyHints: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            Text("\u{2192} next   \u{2190} back   1-5 persona   N notes   H hide keys   R restart   Esc window")
+            Text("\u{2192} next   \u{2190} back   1-\(director.demo.personas.count) persona   N notes   H hide keys   R restart   Esc window")
             Text("\(min(director.beatIndex, director.beatCount)) / \(director.beatCount)").monospacedDigit()
         }
         .font(.system(size: 11, weight: .medium))
@@ -418,5 +427,39 @@ struct OverlayView: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.raised, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+/// Drawn over the front window while the app looks at it, or decides not to.
+struct LookOverlay: View {
+    let look: LookState
+
+    private var info: (text: String, symbol: String, color: Color, dashed: Bool) {
+        switch look {
+        case .looking(let text): return (text, "eye", Theme.accent, true)
+        case .kept(let text): return (text, "checkmark.circle.fill", Theme.accent, false)
+        case .skipped(let text): return (text, "eye.slash", Theme.warn, false)
+        }
+    }
+
+    var body: some View {
+        let i = info
+        ZStack(alignment: .top) {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(i.color, style: StrokeStyle(lineWidth: 3, dash: i.dashed ? [12, 7] : []))
+                .background(i.color.opacity(0.05), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            HStack(spacing: 8) {
+                Image(systemName: i.symbol)
+                Text(i.text).lineLimit(2).multilineTextAlignment(.leading)
+            }
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(i.color, in: Capsule())
+            .shadow(color: .black.opacity(0.2), radius: 8, y: 3)
+            .frame(maxWidth: 620)
+            .offset(y: 46)
+        }
     }
 }

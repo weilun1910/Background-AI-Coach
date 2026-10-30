@@ -2,6 +2,14 @@ import AppKit
 import EventKit
 import SwiftUI
 
+/// What happened when the app looked at a window.
+enum ScreenOutcome {
+    /// It didn't look, and says why.
+    case skipped(String)
+    /// It kept this label, and maybe found a habit.
+    case read(ActivityEntry, HandleResult?)
+}
+
 /// Ties the pieces together: sense -> detect a moment -> check the bucket ->
 /// decide -> schedule -> show a card -> set up -> walkthrough -> log.
 @MainActor
@@ -15,7 +23,9 @@ final class AppModel: ObservableObject {
             guard prefs != oldValue else { return }
             store.save(prefs, "preferences.json")
             detector.useModel = prefs.useOnDeviceModel
+            reader.useModel = prefs.useOnDeviceModel
             refreshStates()
+            if started { startScreenTimer() }
         }
     }
     @Published private(set) var bucketStates: [String: BucketState] = [:]
@@ -24,6 +34,10 @@ final class AppModel: ObservableObject {
     @Published private(set) var pending: Suggestion?
     @Published var panel: PanelState?
     @Published private(set) var calendarAccess: CalendarAccess = .notDetermined
+    /// What the outcome log taught it, like which apps to stay quiet in.
+    @Published private(set) var learned = Learned()
+    /// The last label it kept from a look at a window, for the menu.
+    @Published private(set) var lastLook: (date: Date, text: String)?
 
     let store: Store
     let inventory = Inventory()
@@ -32,6 +46,9 @@ final class AppModel: ObservableObject {
     let calendar = CalendarSensor()
     let appSensor = ActiveAppSensor()
     let setup = SetupRunner()
+    let journal: ActivityJournal
+    let focus = FocusTracker()
+    let reader = ActivityReader()
 
     private var runtime: RuntimeState
     private var timers: [Timer] = []
@@ -40,6 +57,10 @@ final class AppModel: ObservableObject {
     private var activations: [String: [Date]] = [:]
     private var pendingNotBefore: Date?
     private(set) var frontmost: String?
+    private var screenTimer: Timer?
+    private var lookTimes: [Date] = []
+    private var lastLookAt: [String: Date] = [:]
+    private var sensingScreen = false
 
     /// Launched for the persona demo: nothing on this Mac is read.
     nonisolated static let personaLaunch = ["--personas", "--persona-test", "--stage", "--stage-test"].contains { CommandLine.arguments.contains($0) }
@@ -50,24 +71,27 @@ final class AppModel: ObservableObject {
         let store = Store()
         self.store = store
         self.log = OutcomeLog(url: store.dir.appendingPathComponent("outcomes.jsonl"))
+        self.journal = ActivityJournal(url: store.dir.appendingPathComponent("journal.jsonl"))
         self.prefs = store.load("preferences.json", as: Preferences.self) ?? Preferences()
         self.runtime = store.load("state.json", as: RuntimeState.self) ?? RuntimeState()
         let (catalog, error) = CatalogLoader.load(cacheDir: store.dir)
         self.catalog = catalog
         self.catalogError = error
         detector.useModel = prefs.useOnDeviceModel
+        reader.useModel = prefs.useOnDeviceModel
         if !Self.personaLaunch {
             inventory.refresh()
             calendarAccess = calendar.access
         }
         refreshStates()
+        refreshLearned()
     }
 
     // MARK: - Persona demo
 
     /// Swaps in a persona's pretend Mac: their apps, their settings, an empty
     /// log. The engine and the cards are unchanged.
-    func enterPersona(prefs newPrefs: Preferences, apps: [(name: String, lastUsed: Date?)], mcpServers: [String], commands: [String]) {
+    func enterPersona(prefs newPrefs: Preferences, apps: [(name: String, lastUsed: Date?)], mcpServers: [String], commands: [String], history: [OutcomeEvent] = []) {
         personaMode = true
         closePanel()
         pending = nil
@@ -78,10 +102,17 @@ final class AppModel: ObservableObject {
         runtime = RuntimeState()
         saveRuntime()
         log.clear()
+        log.seed(history)
+        journal.clear()
+        focus.clear()
+        lookTimes = []
+        lastLookAt = [:]
+        lastLook = nil
         inventory.loadFixture(apps: apps, mcpServers: mcpServers, commands: commands)
         calendarAccess = .granted
         prefs = newPrefs
         refreshStates()
+        refreshLearned()
     }
 
     /// Which app is in front. The persona demo uses this to put someone on a call.
@@ -114,6 +145,13 @@ final class AppModel: ObservableObject {
         NotificationCenter.default.addObserver(forName: .EKEventStoreChanged, object: calendar.store, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.tick() }
         }
+        timers.append(Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.journal.prune()
+                self?.refreshLearned()
+            }
+        })
+        startScreenTimer()
         tick()
     }
 
@@ -147,7 +185,30 @@ final class AppModel: ObservableObject {
     }
 
     var engine: GapEngine {
-        GapEngine(catalog: catalog, prefs: prefs, usage: { [unowned self] tool in self.usage(of: tool) })
+        GapEngine(catalog: catalog, prefs: prefs, usage: { [unowned self] tool in self.usage(of: tool) }, learned: learned, newToolAllowed: newToolAllowed)
+    }
+
+    /// The one-new-app-a-week budget. The demo's "ignore the limit" lifts it too.
+    var newToolAllowed: Bool {
+        if prefs.newToolsPerWeek <= 0 || prefs.demo.ignoreCap { return true }
+        return log.newToolsShown(since: Clock.now.addingTimeInterval(-7 * 86_400)) < prefs.newToolsPerWeek
+    }
+
+    func refreshLearned() {
+        // Only events after the last reset count.
+        let start = log.events.lastIndex { $0.event == "learning_reset" }.map { $0 + 1 } ?? 0
+        learned = Learned.from(Array(log.events[start...]), now: Clock.now) { [unowned self] id in self.appName(for: id) }
+    }
+
+    /// A readable name for a bundle ID, for "Cards wait while you're in Word".
+    func appName(for bundleID: String) -> String {
+        if let app = inventory.apps.values.first(where: { $0.bundleID == bundleID }) { return app.name.replacingOccurrences(of: "Microsoft ", with: "") }
+        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
+            return url.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "Microsoft ", with: "")
+        }
+        if let known = NeverRead.apps.first(where: { $0.id == bundleID }) { return known.name }
+        let names = ["com.microsoft.Word": "Word", "com.apple.iWork.Pages": "Pages", "com.figma.Desktop": "Figma", "com.apple.iWork.Keynote": "Keynote", "com.microsoft.Powerpoint": "PowerPoint"]
+        return names[bundleID] ?? bundleID
     }
 
     func refreshStates() {
@@ -231,6 +292,10 @@ final class AppModel: ObservableObject {
         frontmost = bundleID
         checkReuse(appName: app.localizedName)
         showPendingIfCalm()
+        if prefs.behaviorOn {
+            let title = prefs.windowTitlesEnabled && ScreenPermissions.accessibility ? (WindowTitles.front(pid: app.processIdentifier) ?? "") : ""
+            noteFocus(bundleID: bundleID, app: app.localizedName ?? bundleID, title: title)
+        }
         guard prefs.appSensorEnabled, let kind = AppMoments.map[bundleID] else { return }
 
         let now = Clock.now
@@ -299,6 +364,8 @@ final class AppModel: ObservableObject {
     func canShow() -> Bool {
         if panel != nil || isPaused { return false }
         if let front = frontmost, AppMoments.callApps.contains(front) { return false }
+        if let front = frontmost, isNeverRead(front) { return false }
+        if let front = frontmost, learned.holdApps[front] != nil { return false }
         if !prefs.demo.ignoreCap && shownToday >= prefs.dailyCap { return false }
         return true
     }
@@ -306,8 +373,16 @@ final class AppModel: ObservableObject {
     private func holdReason() -> String {
         if isPaused { return "You paused suggestions." }
         if let front = frontmost, AppMoments.callApps.contains(front) { return "You look like you're on a call." }
-        if shownToday >= prefs.dailyCap { return "You've already had today's suggestion." }
+        if let front = frontmost, isNeverRead(front) { return "\(appName(for: front)) is on your never-read list, so nothing pops up there." }
+        if let front = frontmost, let count = learned.holdApps[front] {
+            return "You put off or closed \(count) cards while you were in \(appName(for: front)), so this one waits until you switch apps."
+        }
+        if shownToday >= prefs.dailyCap { return prefs.dailyCap == 1 ? "You've already had today's suggestion." : "You've already had today's \(prefs.dailyCap) suggestions." }
         return "Another card is open."
+    }
+
+    func isNeverRead(_ bundleID: String) -> Bool {
+        prefs.neverRead.contains(bundleID) || NeverRead.apps.contains { $0.id == bundleID }
     }
 
     func showPendingIfCalm() {
@@ -325,8 +400,27 @@ final class AppModel: ObservableObject {
     // MARK: - Card actions
 
     func accept(_ s: Suggestion) {
-        record(s.kind == .coach ? "coach_opened" : "setup_started", s)
-        panel = s.kind == .coach ? .walkthrough(s) : .setup(s)
+        switch s.kind {
+        case .coach:
+            record("coach_opened", s)
+            panel = .walkthrough(s)
+        case .tip:
+            record("tip_opened", s)
+            panel = .walkthrough(s)
+        case .setUp:
+            record("setup_started", s)
+            panel = .setup(s)
+        }
+    }
+
+    /// Puts a tip's prompt on the clipboard, ready to paste.
+    func copyPrompt(_ s: Suggestion) {
+        guard let prompt = s.prompt else { return }
+        if !personaMode {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(prompt, forType: .string)
+        }
+        record("prompt_copied", s)
     }
 
     func runSetup(_ s: Suggestion) {
@@ -360,6 +454,13 @@ final class AppModel: ObservableObject {
     }
 
     func never(_ s: Suggestion) {
+        if let workflow = s.workflow {
+            record("never_workflow", s)
+            closePanel()
+            prefs.notForMeWorkflows.insert(workflow.id)
+            addActivity(symbol: "hand.raised", title: "No more \u{201C}\(workflow.name)\u{201D}", detail: "You can turn this back on in Settings.")
+            return
+        }
         record("never_bucket", s)
         closePanel()
         prefs.notForMe.insert(s.bucket.id)
@@ -377,7 +478,8 @@ final class AppModel: ObservableObject {
     }
 
     private func record(_ event: String, _ s: Suggestion) {
-        log.append(OutcomeEvent(date: Clock.now, event: event, tool: s.tool.id, bucket: s.bucket.id, moment: s.moment.kind.rawValue, source: s.moment.source.rawValue))
+        log.append(OutcomeEvent(date: Clock.now, event: event, tool: s.tool.id, bucket: s.bucket.id, moment: s.moment.kind.rawValue, source: s.moment.source.rawValue, app: frontmost, kind: s.kind.rawValue, workflow: s.workflow?.id))
+        refreshLearned()
     }
 
     /// If the user opens a tool within a week of setting it up, note that it stuck.
@@ -426,7 +528,157 @@ final class AppModel: ObservableObject {
         runtime = RuntimeState()
         saveRuntime()
         log.clear()
+        journal.clear()
+        focus.clear()
+        lastLook = nil
         prefs = Preferences()
+        refreshLearned()
+    }
+
+    /// Forget what it learned. The log keeps its history, but nothing before this counts.
+    func resetLearning() {
+        log.append(OutcomeEvent(date: Clock.now, event: "learning_reset", tool: "", bucket: "", moment: "", source: ""))
+        refreshLearned()
+        showPendingIfCalm()
+    }
+
+    func clearJournal() {
+        journal.clear()
+        lastLook = nil
+    }
+
+    // MARK: - Screen and habits
+
+    static let lookAfter: TimeInterval = 60
+    static let lookEvery: TimeInterval = 5 * 60
+    static let looksPerHour = 12
+
+    func startScreenTimer() {
+        let want = prefs.behaviorOn && !personaMode && !Self.personaLaunch
+        if want, screenTimer == nil {
+            screenTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+                Task { @MainActor in await self?.senseScreen() }
+            }
+        } else if !want {
+            screenTimer?.invalidate()
+            screenTimer = nil
+        }
+    }
+
+    /// Every few seconds while screen reading is on: note the window in front,
+    /// and take a look at it once the student has stayed in it a while.
+    func senseScreen() async {
+        guard !sensingScreen, !personaMode, prefs.behaviorOn, !isPaused,
+              let app = NSWorkspace.shared.frontmostApplication, let bundleID = app.bundleIdentifier,
+              bundleID != Bundle.main.bundleIdentifier else { return }
+        sensingScreen = true
+        defer { sensingScreen = false }
+        let name = app.localizedName ?? bundleID
+        let title = prefs.windowTitlesEnabled && ScreenPermissions.accessibility ? (WindowTitles.front(pid: app.processIdentifier) ?? "") : ""
+        noteFocus(bundleID: bundleID, app: name, title: title)
+
+        let canRead = ScreenPermissions.accessibility
+        let canCapture = ScreenPermissions.screen
+        guard prefs.screenLooksEnabled, canRead || canCapture else { return }
+        let now = Clock.now
+        let windowKey = bundleID + "|" + title
+        lookTimes.removeAll { now.timeIntervalSince($0) > 3600 }
+        guard focus.dwell(now: now) >= Self.lookAfter,
+              now.timeIntervalSince(lastLookAt[windowKey] ?? .distantPast) >= Self.lookEvery,
+              lookTimes.count < Self.looksPerHour else { return }
+        // Nothing is read while a password field has the keyboard, or in a never-read window.
+        if ScreenPermissions.secureInput { return }
+        if canRead && WindowText.focusedIsSecure(pid: app.processIdentifier) { return }
+        if NeverRead.reason(bundleID: bundleID, app: name, title: title, extra: prefs.neverRead) != nil { return }
+        lastLookAt[windowKey] = now
+        lookTimes.append(now)
+        // The window's own text first. A picture only when the app keeps its text to itself.
+        let text = canRead ? WindowText.front(pid: app.processIdentifier) : []
+        if text.joined().count >= 200 || !canCapture {
+            await lookAt(image: nil, text: text, app: name, bundleID: bundleID, title: title, dwell: focus.dwell(now: now))
+        } else {
+            let image = try? await WindowCapture.frontWindow(pid: app.processIdentifier)
+            await lookAt(image: image, app: name, bundleID: bundleID, title: title, dwell: focus.dwell(now: now))
+        }
+    }
+
+    /// Remembers which window is in front. When it changes, checks for habits
+    /// that show up in switching, like pasting between an AI chat and a doc.
+    func noteFocus(bundleID: String, app: String, title: String, at date: Date = Clock.now) {
+        let changed = focus.current.map { $0.bundleID != bundleID || $0.title != title } ?? true
+        focus.record(bundleID: bundleID, app: app, title: title, at: date)
+        guard changed, prefs.behaviorOn else { return }
+        if NeverRead.reason(bundleID: bundleID, app: app, title: title, extra: prefs.neverRead) != nil { return }
+        checkSwitchingHabits()
+    }
+
+    /// Habits that show up in switching, like pasting between an AI chat and a doc.
+    @discardableResult
+    func checkSwitchingHabits() -> HandleResult? {
+        guard prefs.behaviorOn else { return nil }
+        let detector = HabitDetector(focus: focus, journal: journal.entries, upcoming: upcoming, now: Clock.now)
+        guard let match = detector.aiDocShuttle() else { return nil }
+        return handleHabit(match, how: prefs.windowTitlesEnabled ? "From your window titles, read on this Mac." : "From which apps you switched between, on this Mac.")
+    }
+
+    /// Reads one window: checks it isn't off limits, reads the text in the
+    /// picture, keeps a short label and looks for a habit. The picture and its
+    /// text are dropped when this returns. Nothing is written but the label.
+    @discardableResult
+    func lookAt(image: CGImage?, text: [String] = [], app: String, bundleID: String?, title: String, dwell: TimeInterval) async -> ScreenOutcome {
+        if let reason = NeverRead.reason(bundleID: bundleID, app: app, title: title, extra: prefs.neverRead) {
+            addActivity(symbol: "eye.slash", title: "Didn't look at \(app)", detail: "Nothing was read because \(reason).")
+            return .skipped(reason)
+        }
+        var lines = text
+        if let image { lines = await TextReader.lines(in: image) }
+        let read = await reader.read(app: app, bundleID: bundleID, title: title, lines: lines)
+        lines.removeAll()
+        let entry = ActivityEntry(date: Clock.now, app: app, bundleID: bundleID, kind: read.kind, label: read.label(app: app), topic: read.topic, organization: read.organization, careerRelated: read.careerRelated, cues: read.cues, source: image == nil && text.isEmpty ? "title" : "look", readBy: read.readBy)
+        let detector = HabitDetector(focus: focus, journal: journal.entries, upcoming: upcoming, now: Clock.now)
+        journal.append(entry)
+        let kept = Redact.clean(entry.label)
+        lastLook = (Clock.now, kept)
+        addActivity(symbol: "eye", title: "Looked at \(app)", detail: "Kept \u{201C}\(kept)\u{201D}. The picture and its text are gone.")
+        guard let match = detector.match(entry, dwell: dwell) else {
+            showPendingIfCalm()
+            return .read(entry, nil)
+        }
+        let how: String
+        if image != nil {
+            how = "From a look at this window, read on this Mac. Only a short label was kept."
+        } else if !text.isEmpty {
+            how = "From the text in this window, read on this Mac. Only a short label was kept."
+        } else {
+            how = "From your window title, read on this Mac."
+        }
+        return .read(entry, handleHabit(match, how: how))
+    }
+
+    @discardableResult
+    func handleHabit(_ match: HabitMatch, how: String) -> HandleResult {
+        if runtime.handled[match.key] != nil { return .duplicate }
+        runtime.handled[match.key] = Clock.now
+        saveRuntime()
+        let moment = Moment(id: match.key, kind: match.habit.momentKind, source: .screen, title: match.noticed, startDate: nil, detectedBy: .habitRules, context: match.noticed)
+        switch engine.decide(habit: match, moment: moment, how: how) {
+        case .quiet(let reason):
+            addActivity(symbol: "lightbulb", title: "Noticed a habit", detail: "\(match.noticed) Stayed quiet. \(reason)")
+            log.append(OutcomeEvent(date: Clock.now, event: "quiet", tool: "", bucket: "", moment: moment.kind.rawValue, source: "screen", app: frontmost))
+            return .quiet(reason)
+        case .suggest(let s):
+            let what = s.kind == .tip ? "a tip for \(s.tool.name)" : s.tool.name
+            addActivity(symbol: "lightbulb", title: "Noticed a habit", detail: "\(match.noticed) Suggesting \(what).")
+            if canShow() {
+                present(s)
+                return .shown(s)
+            }
+            let reason = holdReason()
+            pending = s
+            pendingNotBefore = nil
+            addActivity(symbol: "clock", title: "Holding \(what) for later", detail: reason)
+            return .held(s, reason)
+        }
     }
 
     // MARK: - Demo moments
@@ -496,7 +748,7 @@ final class AppModel: ObservableObject {
 
     private func activityTitle(_ m: Moment) -> String {
         switch m.source {
-        case .activeApp: return m.title
+        case .activeApp, .screen: return m.title
         case .calendar, .simulated:
             return m.startDate == nil ? m.title : "\u{201C}\(m.title)\u{201D}"
         }

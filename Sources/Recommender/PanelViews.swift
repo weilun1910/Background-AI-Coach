@@ -61,10 +61,19 @@ struct SuggestionCardView: View {
         case .calendar: return "\(s.moment.kind.label), from your calendar"
         case .activeApp: return "\(s.moment.kind.label), from the app you're using"
         case .simulated: return "\(s.moment.kind.label), demo moment"
+        case .screen: return s.kind == .tip ? "A tip, from how you work" : "\(s.moment.kind.label), from how you work"
         }
     }
 
     var body: some View {
+        if s.kind == .tip {
+            TipCardView(model: model, s: s)
+        } else {
+            toolCard
+        }
+    }
+
+    private var toolCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             PanelTop(symbol: s.moment.kind.symbol, label: sourceLabel, onClose: { model.dismiss() })
 
@@ -210,18 +219,22 @@ struct WalkthroughView: View {
 
             HStack(spacing: 10) {
                 ToolIcon(symbol: s.tool.symbol, image: model.appIcon(for: s.tool), size: 32)
-                Text("Using \(s.tool.name) for \(s.moment.kind.phrase)")
+                Text(s.workflow.map { "\($0.name), in \(s.tool.name)" } ?? "Using \(s.tool.name) for \(s.moment.kind.phrase)")
                     .font(.headline)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                ForEach(Array(s.tool.walkthrough(for: s.moment.kind).enumerated()), id: \.offset) { index, step in
+                ForEach(Array((s.steps.isEmpty ? s.tool.walkthrough(for: s.moment.kind) : s.steps).enumerated()), id: \.offset) { index, step in
                     NumberedStep(number: index + 1, text: step)
                 }
             }
 
-            if let avoid = s.tool.avoidIf {
+            if let prompt = s.prompt {
+                PromptBox(model: model, s: s, prompt: prompt)
+            }
+
+            if s.kind != .tip, let avoid = s.tool.avoidIf {
                 InfoLine(symbol: "hand.raised", text: "Skip it if \(avoid)")
             }
 
@@ -282,5 +295,104 @@ struct QuietView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(16)
+    }
+}
+
+/// A tip: what the app noticed about how the student works, and a workflow
+/// for an app they already have. No install, so no setup step.
+struct TipCardView: View {
+    @ObservedObject var model: AppModel
+    let s: Suggestion
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            PanelTop(symbol: "lightbulb", label: "A tip, from how you work", onClose: { model.dismiss() })
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(s.headline)
+                    .font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(s.detail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            HStack(spacing: 12) {
+                ToolIcon(symbol: s.tool.symbol, image: model.appIcon(for: s.tool))
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text(s.workflow?.name ?? s.tool.name).font(.body.weight(.semibold)).lineLimit(2)
+                    }
+                    HStack(spacing: 6) {
+                        Text("In \(s.tool.name)").font(.caption).foregroundStyle(.secondary)
+                        Chip(text: "You have this", color: Theme.accent)
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(10)
+            .background(Theme.raised, in: RoundedRectangle(cornerRadius: Theme.innerRadius, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 8) {
+                if let why = s.workflow?.why { InfoLine(symbol: "lightbulb", text: why, color: Theme.accent) }
+                if let how = s.how { InfoLine(symbol: "eye", text: how) }
+                if let learned = s.learned { InfoLine(symbol: "sparkles", text: learned) }
+            }
+
+            HStack(spacing: 6) {
+                Chip(text: "Prompt ready to paste", color: Theme.quiet, symbol: "text.quote")
+                Chip(text: "Nothing to install", color: Theme.quiet, symbol: "checkmark")
+            }
+
+            HStack(spacing: 8) {
+                Button("Show me") { model.accept(s) }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .stageTarget("card-primary")
+                Button("Later") { model.later(s) }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .stageTarget("card-later")
+                Spacer()
+                Button("Not for me") { model.never(s) }
+                    .buttonStyle(QuietButtonStyle())
+                    .help("Never suggest this tip again")
+                    .stageTarget("card-notforme")
+            }
+        }
+        .padding(16)
+    }
+}
+
+/// The prompt, filled in on this Mac, with a button that copies it.
+struct PromptBox: View {
+    @ObservedObject var model: AppModel
+    let s: Suggestion
+    let prompt: String
+    @State private var copied = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                SectionLabel("Your prompt")
+                Spacer()
+                Button {
+                    model.copyPrompt(s)
+                    copied = true
+                } label: {
+                    Label(copied ? "Copied" : "Copy prompt", systemImage: copied ? "checkmark" : "doc.on.doc")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .stageTarget("prompt-copy")
+            }
+            Text(prompt)
+                .font(.callout)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Theme.raised, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(copied ? Theme.accent : Theme.hairline))
+        }
+        .onChange(of: s.id) { _, _ in copied = false }
     }
 }

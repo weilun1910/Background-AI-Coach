@@ -67,12 +67,13 @@ function save() {
 }
 
 function label(choice, card) {
-  if (choice === "accept") return card.kind === "coach" ? "Show me how" : "Set it up";
+  if (choice === "accept") return card.kind === "coach" ? "Show me how" : card.kind === "tip" ? "Show me" : "Set it up";
   return choice === "later" ? "Later" : "Not for me";
 }
 
 function demoDid(slide, name) {
   if (slide.scripted === "never") return `${name} said Not for me`;
+  if (slide.card.kind === "tip") return `${name} clicked Show me`;
   return slide.card.kind === "coach" ? `${name} clicked Show me how` : `${name} set it up`;
 }
 
@@ -214,7 +215,7 @@ function renderHome() {
       <div class="eyebrow">${sparkle()} Background AI Coach</div>
       <h1>Try a day with Background AI Coach</h1>
       <div class="intro">
-        <p>Background AI Coach is a Mac app that lives in your menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes or a midterm tomorrow. If you don't have a good tool for that moment, it suggests one and sets it up. If you already have one you never open, it shows you how to use it. If you're covered, it stays quiet.</p>
+        <p>Background AI Coach is a Mac app that lives in your menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes or a midterm tomorrow. If you don't have a good tool for that moment, it suggests one and sets it up. If you already have one you never open, it shows you how to use it. If you're covered, it stays quiet. Rory's day shows a newer version that, if you turn it on, also notices how you work on screen and suggests better ways to use apps you already have.</p>
         <p>Here you'll step through made-up students' days on their Mac. What the app does at each moment was decided by the real app. When a card shows up, pick what you'd actually do if you were them. Try ${plural(survey.unlockAfter, "student")}, starting with the one most like you, and then there's a short survey.</p>
       </div>
       ${status}
@@ -368,7 +369,7 @@ function renderSummary() {
           return `
             <li>
               <div class="moment">${esc(s.title)}</div>
-              <div class="detail">${esc(s.card.kind === "coach" ? "Coached" : "Suggested")} ${esc(s.card.tool)}. You picked ${esc(picked ? label(picked, s.card) : "nothing")}.</div>
+              <div class="detail">${esc(s.card.kind === "coach" ? "Coached on" : s.card.kind === "tip" ? "A tip for" : "Suggested")} ${esc(s.card.tool)}. You picked ${esc(picked ? label(picked, s.card) : "nothing")}.</div>
             </li>`;
         }).join("")}
       </ul>

@@ -81,6 +81,7 @@ struct StageWindowView: View {
         case "safari": SafariApp(window: window, director: director)
         case "granola": GranolaApp(window: window)
         case "chatgpt", "claude", "gemini": ChatApp(window: window)
+        case "passwords": PasswordsApp(window: window)
         default: FakeWindow(title: window.title) { Color.white }
         }
     }
@@ -730,6 +731,7 @@ struct SafariApp: View {
         if page == "ocs" { return "ocs.yale.edu/interviewing" }
         if page.hasPrefix("article:") { return "canvas.yale.edu/courses/readings" }
         if page.hasPrefix("web:") { return String(page.dropFirst(4).split(separator: "|").first ?? "") }
+        if page.hasPrefix("profile:") || page.hasPrefix("posting:") { return String(page.split(separator: "|").last ?? "") }
         if page.hasPrefix("site:"), let tool = director.model.catalog.tool(String(page.dropFirst(5))),
            let host = URL(string: tool.setup.url ?? tool.source)?.host {
             return host.replacingOccurrences(of: "www.", with: "")
@@ -776,6 +778,10 @@ struct SafariApp: View {
         } else if page.hasPrefix("web:") {
             let parts = page.dropFirst(4).split(separator: "|").map(String.init)
             SimpleSitePage(brand: parts.last ?? "", headline: parts.last ?? "", blurb: "Search results, saved threads and sources.", accent: .teal, symbol: "globe")
+        } else if page.hasPrefix("profile:") {
+            ProfilePage(parts: page.dropFirst(8).split(separator: "|").map(String.init))
+        } else if page.hasPrefix("posting:") {
+            PostingPage(parts: page.dropFirst(8).split(separator: "|").map(String.init))
         } else if page.hasPrefix("site:"), let tool = director.model.catalog.tool(String(page.dropFirst(5))) {
             ToolSitePage(tool: tool)
         } else {
@@ -1105,6 +1111,157 @@ struct ChatApp: View {
                 Image(systemName: "xmark").font(.system(size: 20)).frame(width: 52, height: 52).background(Color.black.opacity(0.06), in: Circle())
             }
             Spacer()
+        }
+    }
+}
+
+// MARK: - Pages for screen moments
+
+/// A professional profile page: name, headline, experience.
+/// parts: name | headline | location | domain
+struct ProfilePage: View {
+    let parts: [String]
+    private let blue = Color(red: 0.04, green: 0.4, blue: 0.76)
+
+    private func part(_ i: Int) -> String { parts.indices.contains(i) ? parts[i] : "" }
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            Color(red: 0.95, green: 0.94, blue: 0.92)
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 0) {
+                    LinearGradient(colors: [Color(red: 0.55, green: 0.67, blue: 0.78), Color(red: 0.75, green: 0.82, blue: 0.86)], startPoint: .leading, endPoint: .trailing)
+                        .frame(height: 90)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Circle()
+                            .fill(Color(red: 0.42, green: 0.5, blue: 0.62))
+                            .frame(width: 84, height: 84)
+                            .overlay(Text(initials).font(.system(size: 28, weight: .semibold)).foregroundStyle(.white))
+                            .overlay(Circle().strokeBorder(.white, lineWidth: 4))
+                            .offset(y: -44)
+                            .padding(.bottom, -44)
+                        Text(part(0)).font(.system(size: 22, weight: .semibold))
+                        Text(part(1)).font(.system(size: 15))
+                        Text("\(part(2))   500+ connections").font(.system(size: 13)).foregroundStyle(.secondary)
+                        HStack(spacing: 8) {
+                            Text("Connect").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).padding(.horizontal, 16).padding(.vertical, 6).background(blue, in: Capsule())
+                            Text("Message").font(.system(size: 13, weight: .semibold)).foregroundStyle(blue).padding(.horizontal, 16).padding(.vertical, 6).overlay(Capsule().strokeBorder(blue))
+                        }
+                        .padding(.top, 4)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 16)
+                }
+                .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Experience").font(.system(size: 17, weight: .semibold))
+                    ForEach(experience, id: \.0) { item in
+                        HStack(alignment: .top, spacing: 10) {
+                            RoundedRectangle(cornerRadius: 6).fill(Color.black.opacity(0.08)).frame(width: 40, height: 40)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.0).font(.system(size: 14, weight: .semibold))
+                                Text(item.1).font(.system(size: 13))
+                                Text(item.2).font(.system(size: 12)).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
+            }
+            .padding(20)
+        }
+    }
+
+    private var initials: String {
+        part(0).split(separator: " ").compactMap(\.first).prefix(2).map(String.init).joined()
+    }
+
+    private var experience: [(String, String, String)] {
+        [
+            ("Engagement Manager", "McKinsey & Company, public sector practice", "2022 - present"),
+            ("Budget Analyst", "City of Hartford, Office of Management and Budget", "2018 - 2020"),
+            ("Yale University", "B.A., Political Science", "2014 - 2018"),
+        ]
+    }
+}
+
+/// A job posting page. parts: company | role | location | domain
+struct PostingPage: View {
+    let parts: [String]
+    private let navy = Color(red: 0.03, green: 0.13, blue: 0.29)
+
+    private func part(_ i: Int) -> String { parts.indices.contains(i) ? parts[i] : "" }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                Text(part(0).uppercased()).font(.system(size: 12, weight: .bold)).foregroundStyle(navy.opacity(0.7))
+                Text(part(1)).font(.system(size: 26, weight: .semibold)).foregroundStyle(navy)
+                HStack(spacing: 12) {
+                    Text(part(2)).font(.system(size: 13)).foregroundStyle(.secondary)
+                    Spacer()
+                    Text("Apply now").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).padding(.horizontal, 18).padding(.vertical, 8).background(navy, in: RoundedRectangle(cornerRadius: 6))
+                }
+                Divider()
+                section("About the role", ["Business Analysts work in small teams on problems for public, private and social sector clients. You'll spend ten weeks on a real client team."])
+                section("What you'll do", ["Gather and analyze data to find what's driving a client's problem.", "Work with client stakeholders to test your ideas and build support for a recommendation.", "Present your findings to your team and to the client."])
+                section("Qualifications", ["Strong problem solving and comfort with numbers.", "Experience leading a team, a project or an organization.", "Clear writing and speaking, in English."])
+            }
+            .padding(30)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(Color.white)
+    }
+
+    private func section(_ title: String, _ lines: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.system(size: 16, weight: .semibold)).foregroundStyle(navy)
+            ForEach(lines, id: \.self) { line in
+                Text("\u{2022}  " + line).font(.system(size: 13.5)).fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
+/// Apple's Passwords app. The coach never reads it.
+struct PasswordsApp: View {
+    let window: StageWindow
+
+    var body: some View {
+        FakeWindow(title: "Passwords") {
+            HStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(["All", "Passkeys", "Codes", "Wi-Fi", "Security"], id: \.self) { item in
+                        Label(item, systemImage: item == "All" ? "key.fill" : "circle").font(.system(size: 13, weight: item == "All" ? .semibold : .regular))
+                    }
+                    Spacer()
+                }
+                .padding(14)
+                .frame(width: 170)
+                .background(Color(white: 0.95))
+                Divider()
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(["Bank of America", "Canvas", "Handshake", "Yale NetID", "Venmo"], id: \.self) { site in
+                        HStack(spacing: 10) {
+                            RoundedRectangle(cornerRadius: 6).fill(Color.black.opacity(0.08)).frame(width: 30, height: 30)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(site).font(.system(size: 13, weight: .medium))
+                                Text("\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}").font(.system(size: 12)).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 9)
+                        Divider()
+                    }
+                    Spacer()
+                }
+                .background(Color.white)
+            }
         }
     }
 }

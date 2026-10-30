@@ -24,6 +24,13 @@ enum StageContent {
                 "This chapter follows three of those groups through their first year. It asks why two of them dissolved within months while the third became a standing tenants' association.",
                 "Drawing on 22 interviews and the groups' own records, I argue that the difference lay less in resources than in how each group handled the first disagreement over who should get help.",
             ])
+        case "coverMcKinsey":
+            return ("Cover letter: McKinsey & Company, Business Analyst Intern", [
+                "Dear McKinsey Recruiting Team,",
+                "I'm a junior at Yale studying Political Science, and I'm applying for the Business Analyst internship. I've spent two summers working on housing policy, first at a city council office and then at a tenants' rights nonprofit.",
+                "At the nonprofit I helped analyze eviction filings across four neighborhoods and presented the findings to the board, which changed where it sent its two staff lawyers.",
+                "I want to learn how to break messy problems into pieces a client can act on, and I think McKinsey's public sector practice is where I'd learn that fastest.",
+            ])
         case "fellowship":
             return ("Personal statement: Fulbright research grant", [
                 "When I started interviewing organizers in New Haven, I expected to study resources. I ended up studying trust.",
@@ -45,7 +52,41 @@ enum StageContent {
         "The third reading is a field study. It follows a studio through one semester and counts how often students cite a rule versus a precedent when defending a decision.",
     ]
 
+    /// What the student pastes into their AI app for a tip: the prompt, plus what it asked for.
+    static func tipMessage(_ workflow: String, prompt: String) -> String {
+        switch workflow {
+        case "coffee-chat-questions":
+            return prompt.replacingOccurrences(of: "[paste it here]", with: "Engagement Manager, public sector practice. Yale College, Political Science. Before McKinsey, two years at a city budget office.")
+        default:
+            return prompt.replacingOccurrences(of: "[paste it here]", with: "...").replacingOccurrences(of: "[paste them here]", with: "...")
+        }
+    }
+
     static func chatReply(_ app: String, flag: String?) -> [String] {
+        if flag == "shuttle" {
+            return ["Here's a more confident version: \"At the nonprofit, I analyzed eviction filings across four neighborhoods and presented findings that changed where the board sent its lawyers.\""]
+        }
+        if flag == "tip:feedback-in-one-go" {
+            return [
+                "1. \"I've spent two summers working on housing policy\" says where you were, not what you did. What's one decision your work changed?",
+                "2. \"I think McKinsey's public sector practice is where I'd learn that fastest\" could be in anyone's letter. What did you hear from someone there that made you want it?",
+                "3. The eviction analysis is your strongest line. What did the board do differently because of it?",
+            ]
+        }
+        if flag == "tip:coffee-chat-questions" {
+            return [
+                "1. What made you move from a city budget office to consulting, and what did you miss about the public side?",
+                "2. How did you get staffed on your first public sector cases, and what would you do differently in your first year?",
+                "3. When a client is a city government, who actually owns the decision at the end of a project?",
+            ]
+        }
+        if flag == "tip:posting-check" {
+            return [
+                "1. Problem solving with data: shown. \"I helped analyze eviction filings across four neighborhoods.\"",
+                "2. Working with clients or stakeholders: missing. When did you have to change someone's mind with your findings?",
+                "3. Leadership: missing. Have you led a team or a project, even a small one?",
+            ]
+        }
         if flag == "guided" {
             return ["Let's start with what you already know. In one sentence, what's the difference between working memory and long-term memory?"]
         }

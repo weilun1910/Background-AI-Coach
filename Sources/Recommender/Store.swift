@@ -86,6 +86,19 @@ struct Preferences: Codable, Equatable {
     var appSensorEnabled = true
     var useOnDeviceModel = true
     var demo = DemoSettings()
+    /// Careers the student is working toward, from onboarding.
+    var careers: [String] = []
+    var recruitingNow = false
+    /// Read the title of the window in front. Needs Accessibility. Off by default.
+    var windowTitlesEnabled = false
+    /// Take an occasional look at the window in front. Needs Screen Recording. Off by default.
+    var screenLooksEnabled = false
+    /// Apps the student added to the never-read list, by bundle ID.
+    var neverRead: Set<String> = []
+    /// Workflows the student said no to.
+    var notForMeWorkflows: Set<String> = []
+    /// New apps it may suggest in a week. 0 means no limit.
+    var newToolsPerWeek = 1
 
     static let hubs: [(id: String, name: String)] = [
         ("claude", "Claude"),
@@ -112,7 +125,17 @@ struct Preferences: Codable, Equatable {
         appSensorEnabled = try c.decodeIfPresent(Bool.self, forKey: .appSensorEnabled) ?? d.appSensorEnabled
         useOnDeviceModel = try c.decodeIfPresent(Bool.self, forKey: .useOnDeviceModel) ?? d.useOnDeviceModel
         demo = try c.decodeIfPresent(DemoSettings.self, forKey: .demo) ?? d.demo
+        careers = try c.decodeIfPresent([String].self, forKey: .careers) ?? d.careers
+        recruitingNow = try c.decodeIfPresent(Bool.self, forKey: .recruitingNow) ?? d.recruitingNow
+        windowTitlesEnabled = try c.decodeIfPresent(Bool.self, forKey: .windowTitlesEnabled) ?? d.windowTitlesEnabled
+        screenLooksEnabled = try c.decodeIfPresent(Bool.self, forKey: .screenLooksEnabled) ?? d.screenLooksEnabled
+        neverRead = try c.decodeIfPresent(Set<String>.self, forKey: .neverRead) ?? d.neverRead
+        notForMeWorkflows = try c.decodeIfPresent(Set<String>.self, forKey: .notForMeWorkflows) ?? d.notForMeWorkflows
+        newToolsPerWeek = try c.decodeIfPresent(Int.self, forKey: .newToolsPerWeek) ?? d.newToolsPerWeek
     }
+
+    /// Either screen signal is on, so the app looks for habits.
+    var behaviorOn: Bool { windowTitlesEnabled || screenLooksEnabled }
 }
 
 /// Bookkeeping that isn't a preference: which moments were already handled.
@@ -131,6 +154,11 @@ struct OutcomeEvent: Codable {
     var bucket: String
     var moment: String
     var source: String
+    /// The app in front when it happened, so the app can learn when not to interrupt.
+    var app: String? = nil
+    /// setUp, coach or tip.
+    var kind: String? = nil
+    var workflow: String? = nil
 }
 
 final class OutcomeLog {
@@ -178,5 +206,15 @@ final class OutcomeLog {
 
     func lastDate(_ event: String, tool: String) -> Date? {
         events.last { $0.event == event && $0.tool == tool }?.date
+    }
+
+    /// New apps suggested in the last week, for the one-new-app-a-week limit.
+    func newToolsShown(since date: Date) -> Int {
+        events.filter { $0.event == "shown" && $0.kind == "setUp" && $0.date >= date }.count
+    }
+
+    /// Adds past events without touching the file. The persona demo uses this.
+    func seed(_ past: [OutcomeEvent]) {
+        events.insert(contentsOf: past, at: 0)
     }
 }

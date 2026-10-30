@@ -48,7 +48,7 @@ enum StageTest {
     private static func describe(_ panel: PanelState?) -> String {
         switch panel {
         case .none: return "none"
-        case .card(let s): return "\(s.kind == .coach ? "coach" : "suggest") \(s.tool.name)"
+        case .card(let s): return "\(s.kind == .setUp ? "suggest" : s.kind.rawValue) \(s.tool.name)"
         case .setup(let s): return "setup \(s.tool.name)"
         case .walkthrough(let s): return "walkthrough \(s.tool.name)"
         case .done(let s): return "done \(s.tool.name)"

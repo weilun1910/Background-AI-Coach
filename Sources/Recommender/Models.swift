@@ -67,16 +67,19 @@ enum MomentKind: String, Codable, CaseIterable, Identifiable {
 
 enum SignalSource: String, Codable {
     case calendar, activeApp, simulated
+    /// Window titles and occasional looks at the front window.
+    case screen
 }
 
 enum Detector: String, Codable {
-    case onDeviceModel, rules, appRules
+    case onDeviceModel, rules, appRules, habitRules
 
     var label: String {
         switch self {
         case .onDeviceModel: return "Apple's on-device model"
         case .rules: return "keyword rules"
         case .appRules: return "app rules"
+        case .habitRules: return "habit rules"
         }
     }
 }
@@ -100,11 +103,15 @@ struct Catalog: Codable {
     var note: String?
     var buckets: [Bucket]
     var tools: [Tool]
+    /// Tips and workflows for tools people already have. Older catalogs have none.
+    var workflows: [Workflow]?
 
-    static let empty = Catalog(version: "none", publishedAt: "", note: nil, buckets: [], tools: [])
+    static let empty = Catalog(version: "none", publishedAt: "", note: nil, buckets: [], tools: [], workflows: [])
 
     func bucket(_ id: String) -> Bucket? { buckets.first { $0.id == id } }
     func tool(_ id: String) -> Tool? { tools.first { $0.id == id } }
+    func workflow(_ id: String) -> Workflow? { (workflows ?? []).first { $0.id == id } }
+    func workflows(for habit: Habit) -> [Workflow] { (workflows ?? []).filter { $0.habit == habit } }
     func tools(in bucket: Bucket) -> [Tool] { tools.filter { $0.buckets.contains(bucket.id) } }
     func buckets(for kind: MomentKind) -> [Bucket] { buckets.filter { $0.moments.contains(kind) } }
 }
@@ -195,12 +202,23 @@ struct Tool: Codable, Identifiable, Hashable {
     var detect: Detect
     var setup: SetupRecipe
     var walkthrough: [String: [String]]
+    /// A version of the walkthrough for a career, like a case interview for consulting.
+    var careerWalkthrough: [String: [String]]?
+    /// Careers this tool is especially good for. It ranks a little higher for them.
+    var careers: [String]?
     var source: String
 
     func score(for bucket: String) -> Double { scores[bucket] ?? 0 }
 
     func walkthrough(for kind: MomentKind) -> [String] {
         walkthrough[kind.rawValue] ?? walkthrough["default"] ?? walkthrough.values.first ?? []
+    }
+
+    func walkthrough(for kind: MomentKind, careers: [String]) -> [String] {
+        for career in careers {
+            if let steps = careerWalkthrough?[career] { return steps }
+        }
+        return walkthrough(for: kind)
     }
 
     /// Tools the user has to tell us about, because the Mac can't see them.
@@ -235,6 +253,8 @@ enum SuggestionKind: String {
     case setUp
     /// The user owns a tool for this but isn't using it: show them how.
     case coach
+    /// A habit could go better with a tool the user already has: a workflow and a prompt.
+    case tip
 }
 
 struct Suggestion: Identifiable, Equatable {
@@ -245,6 +265,15 @@ struct Suggestion: Identifiable, Equatable {
     var kind: SuggestionKind
     var headline: String
     var detail: String
+    /// For tips: the workflow, and its prompt filled in for this moment.
+    var workflow: Workflow? = nil
+    var prompt: String? = nil
+    /// Where the app got this from, in plain words. "From a look at this window."
+    var how: String? = nil
+    /// What it learned that shaped this card, if anything.
+    var learned: String? = nil
+    /// Steps for the rundown, already picked for the user's career.
+    var steps: [String] = []
 
     static func == (a: Suggestion, b: Suggestion) -> Bool { a.id == b.id }
 }

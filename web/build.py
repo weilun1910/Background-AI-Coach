@@ -15,6 +15,7 @@ import sys
 BEAT = re.compile(r"^\s+(\d\d) (.+?)  \[windows: .*?\] \[card: (.*?)\](.*)$")
 STARTS_STEP = {"scene", "leave call", "next morning"}
 LEAD_BEATS = {"notification", "switching", "call"}
+LOOK_TEXT = "The coach takes a look at the window, on the Mac. It keeps one short line about it and drops the picture."
 SKIP = {"scene", "got it", "close the menu", "end"}
 
 
@@ -57,6 +58,7 @@ def frame_name(persona_id, number, label):
 def slides_for(persona, beats, captions):
     steps, slides = persona["steps"], []
     step_index = -1
+    lead_used = set()
     for number, label, card in beats:
         if label in STARTS_STEP:
             step_index += 1
@@ -69,8 +71,15 @@ def slides_for(persona, beats, captions):
         if label in SKIP:
             continue
         if label in LEAD_BEATS:
+            lead_used.add(step_index)
             slides.append({**base, "type": "view", "text": text["lead"]})
-        elif kind in ("suggest", "coach") and label in ("react", "leave call", "next morning"):
+        elif label == "glimpse":
+            # Screen steps: the lead goes on the first slide of the step.
+            first = step_index not in lead_used
+            lead_used.add(step_index)
+            look = text.get("look", LOOK_TEXT)
+            slides.append({**base, "type": "view", "text": f"{text['lead']} {look}" if first else look})
+        elif kind in ("suggest", "coach", "tip") and label in ("react", "leave call", "next morning"):
             slides.append({
                 **base,
                 "type": "choice",
@@ -90,6 +99,10 @@ def slides_for(persona, beats, captions):
             slides.append({**base, "type": "view", "zoom": "card", "text": "Done. Then a one-minute rundown for this exact moment."})
         elif label == "click Show me how":
             slides.append({**base, "type": "view", "zoom": "card", "text": f"A one-minute rundown of {tool} for this moment."})
+        elif label == "click Show me":
+            slides.append({**base, "type": "view", "zoom": "card", "text": f"The steps, and a prompt for {tool} that's already filled in."})
+        elif label == "copy prompt":
+            slides.append({**base, "type": "view", "zoom": "card", "text": "Copy prompt puts it on the clipboard, ready to paste. The details in it, like the company, were filled in on the Mac."})
         elif label == "open the menu":
             slides.append({**base, "type": "view", "zoom": "menu", "text": text["outcome"]})
         elif label in ("click Not for me", "open the tool"):

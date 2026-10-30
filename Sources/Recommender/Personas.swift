@@ -19,6 +19,9 @@ struct Persona: Codable, Identifiable, Equatable {
     var apps: [PersonaApp]
     var mcpServers: [String]?
     var commands: [String]?
+    /// Things that happened in the weeks before the demo day, so the day can
+    /// show what the app learned from them.
+    var history: [PersonaHistory]?
     var steps: [PersonaStep]
 
     static func == (a: Persona, b: Persona) -> Bool { a.id == b.id }
@@ -30,6 +33,22 @@ struct PersonaPrefs: Codable {
     var selfReported: [String]
     var notForMe: [String]
     var dailyCap: Int
+    var careers: [String]?
+    var recruitingNow: Bool?
+    var windowTitles: Bool?
+    var screenLooks: Bool?
+    /// Leave out for the original five days, which ran without a weekly limit.
+    var newToolsPerWeek: Int?
+}
+
+struct PersonaHistory: Codable {
+    var daysAgo: Int
+    var event: String
+    var tool: String
+    var workflow: String?
+    var kind: String?
+    /// The app in front, by bundle ID.
+    var app: String?
 }
 
 struct PersonaApp: Codable, Hashable {
@@ -39,6 +58,8 @@ struct PersonaApp: Codable, Hashable {
 
 enum PersonaStepType: String, Codable {
     case calendar, appSwitch, callStart, callEnd, nextMorning
+    /// Something on screen: switching windows, and maybe a look at the front one.
+    case screen
 }
 
 /// What the presenter is meant to click on the card. The headless run clicks it.
@@ -57,6 +78,10 @@ struct PersonaStep: Codable {
     var moment: MomentKind?
     var switches: Int?
     var click: PresenterClick?
+    /// For screen steps: take a look at the front window.
+    var glimpse: Bool?
+    /// For screen steps: minutes the front window has been in front.
+    var dwell: Int?
     var narration: String
     /// Windows on the pretend desktop for the full-screen demo, back to front.
     var scene: [SceneWindowSpec]?
@@ -136,12 +161,20 @@ final class PersonaDemo: ObservableObject {
         prefs.selfReported = Set(persona.prefs.selfReported)
         prefs.notForMe = Set(persona.prefs.notForMe)
         prefs.dailyCap = persona.prefs.dailyCap
+        prefs.careers = persona.prefs.careers ?? []
+        prefs.recruitingNow = persona.prefs.recruitingNow ?? false
+        prefs.windowTitlesEnabled = persona.prefs.windowTitles ?? false
+        prefs.screenLooksEnabled = persona.prefs.screenLooks ?? false
+        prefs.newToolsPerWeek = persona.prefs.newToolsPerWeek ?? 0
         prefs.demo = DemoSettings(freshMac: false, dryRun: true, ignoreCap: false)
 
         let apps = persona.apps.map { app in
             (name: app.name, lastUsed: app.daysSinceUsed.map { Clock.now.addingTimeInterval(-Double($0) * 86_400) })
         }
-        model.enterPersona(prefs: prefs, apps: apps, mcpServers: persona.mcpServers ?? [], commands: persona.commands ?? [])
+        let history = (persona.history ?? []).map { h in
+            OutcomeEvent(date: Clock.now.addingTimeInterval(-Double(h.daysAgo) * 86_400), event: h.event, tool: h.tool, bucket: "", moment: "", source: "history", app: h.app, kind: h.kind, workflow: h.workflow)
+        }
+        model.enterPersona(prefs: prefs, apps: apps, mcpServers: persona.mcpServers ?? [], commands: persona.commands ?? [], history: history)
         // Clear the last persona's events now; reading the new titles takes a moment.
         model.upcoming = []
         refreshUpcoming()
@@ -213,6 +246,119 @@ final class PersonaDemo: ObservableObject {
                 return StepOutcome(text: "New day. Showed the waiting \(s.tool.name) card.", tone: .card)
             }
             return StepOutcome(text: "New day. Nothing was waiting.", tone: .info)
+
+        case .screen:
+            let windows = step.scene?.map(StageDirector.window) ?? []
+            recordSwitching(step, windows: windows)
+            return describeScreen(await playScreen(step, windows: windows))
+        }
+    }
+
+    // MARK: Screen steps
+
+    /// What a screen step did: a card (or not), or a look that was skipped.
+    enum ScreenStepResult {
+        case handled(HandleResult)
+        case skipped(String)
+        case nothing(String?)
+    }
+
+    /// The front window's app: its name and bundle ID.
+    func frontApp(_ step: PersonaStep, windows: [StageWindow]) -> (key: String, name: String, bundleID: String) {
+        let key = windows.last?.app ?? "finder"
+        let info = StageApps.info(key)
+        return (key, info.name, step.bundleID ?? info.bundleIDs.first ?? key)
+    }
+
+    /// Puts the switching between the last two windows into the app's focus
+    /// history, spread over the last few minutes. Ends on the front window.
+    func recordSwitching(_ step: PersonaStep, windows: [StageWindow]) {
+        let now = Clock.now
+        let front = frontApp(step, windows: windows)
+        let dwell = Double(step.dwell ?? 2) * 60
+        let switches = step.switches ?? 0
+        guard switches > 0, windows.count >= 2 else {
+            model.focus.record(bundleID: front.bundleID, app: front.name, title: windowTitle(windows.last), at: now.addingTimeInterval(-dwell))
+            return
+        }
+        let other = windows[windows.count - 2]
+        let otherInfo = StageApps.info(other.app)
+        let otherID = otherInfo.bundleIDs.first ?? other.app
+        model.focus.record(bundleID: front.bundleID, app: front.name, title: windowTitle(windows.last), at: now.addingTimeInterval(-Double(switches + 1) * 120))
+        for i in 0..<switches {
+            let onOther = i % 2 == 0
+            let at = now.addingTimeInterval(-Double(switches - i) * 120 + (i == switches - 1 ? 0 : 0))
+            if onOther {
+                model.focus.record(bundleID: otherID, app: otherInfo.name, title: windowTitle(other), at: at)
+            } else {
+                model.focus.record(bundleID: front.bundleID, app: front.name, title: windowTitle(windows.last), at: at)
+            }
+        }
+        if model.focus.current?.bundleID != front.bundleID {
+            model.focus.record(bundleID: front.bundleID, app: front.name, title: windowTitle(windows.last), at: now)
+        }
+    }
+
+    private func windowTitle(_ window: StageWindow?) -> String {
+        guard let window else { return "" }
+        return window.title
+    }
+
+    /// Plays a screen step through the real app: the switching habit check,
+    /// then a look at the front window, read by the real text recognition
+    /// and Apple's model from a picture of the pretend window.
+    func playScreen(_ step: PersonaStep, windows: [StageWindow]) async -> ScreenStepResult {
+        // Habits like coffee chat prep read the calendar, so let it finish loading.
+        await upcomingTask?.value
+        let front = frontApp(step, windows: windows)
+        let hadCard = model.panel != nil
+        model.setFrontmost(front.bundleID)
+        if !hadCard, case .card(let s) = model.panel {
+            return .handled(.shown(s))
+        }
+        // The look comes first, so a habit found in switching can use what it saw.
+        var kept: String?
+        if step.glimpse == true, let window = windows.last {
+            let title = windowTitle(window)
+            if let reason = NeverRead.reason(bundleID: front.bundleID, app: front.name, title: title, extra: model.prefs.neverRead) {
+                // Off limits: no picture is even taken.
+                model.addActivity(symbol: "eye.slash", title: "Didn't look at \(front.name)", detail: "Nothing was read because \(reason).")
+                return .skipped(reason)
+            }
+            let image = Snapshots.image(StageWindowView(window: window, director: StageDirector.shared), width: window.frame.width, height: window.frame.height)
+            switch await model.lookAt(image: image, app: front.name, bundleID: front.bundleID, title: title, dwell: Double(step.dwell ?? 2) * 60) {
+            case .skipped(let reason):
+                return .skipped(reason)
+            case .read(let entry, let result):
+                if let result, !isDuplicate(result) { return .handled(result) }
+                kept = entry.label
+            }
+        }
+        if (step.switches ?? 0) > 0, let result = model.checkSwitchingHabits(), !isDuplicate(result) {
+            return .handled(result)
+        }
+        return .nothing(kept)
+    }
+
+    private func isDuplicate(_ result: HandleResult) -> Bool {
+        if case .duplicate = result { return true }
+        return false
+    }
+
+    private func describeScreen(_ result: ScreenStepResult) -> StepOutcome {
+        switch result {
+        case .handled(let r):
+            if case .shown(let s) = r, s.kind == .tip {
+                return StepOutcome(text: "Tip: \(s.workflow?.name ?? s.tool.name) in \(s.tool.name).", tone: .card)
+            }
+            if case .held(let s, let reason) = r, s.kind == .tip {
+                return StepOutcome(text: "Held a tip. \(reason)", tone: .held)
+            }
+            return describe(r)
+        case .skipped(let reason):
+            return StepOutcome(text: "Didn't look. \(reason.capitalizedFirst).", tone: .quiet)
+        case .nothing(let label):
+            return StepOutcome(text: label.map { "Kept \u{201C}\($0)\u{201D}. No habit, so quiet." } ?? "Nothing to do.", tone: .quiet)
         }
     }
 
@@ -258,6 +404,10 @@ final class PersonaDemo: ObservableObject {
             return "The call ends"
         case .nextMorning:
             return "Next morning"
+        case .screen:
+            let app = step.scene?.last.map { StageApps.info($0.app).name } ?? "an app"
+            if let switches = step.switches, switches > 0 { return "Goes back and forth to \(app) \(switches) times" }
+            return step.glimpse == true ? "Working in \(app)" : "Switches to \(app)"
         }
     }
 
@@ -326,6 +476,7 @@ final class PersonaDemo: ObservableObject {
         switch click {
         case .setUp:
             model.accept(s)
+            if s.kind == .tip { model.copyPrompt(s) }
             if s.kind == .setUp {
                 model.runSetup(s)
                 try? await Task.sleep(for: .seconds(1.4))

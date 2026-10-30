@@ -559,6 +559,188 @@
           ]
         }
       ]
+    },
+    {
+      "id": "rory",
+      "name": "Rory",
+      "tagline": "Political Science junior recruiting for consulting",
+      "about": "Pays for ChatGPT Plus and uses it for everything, mostly by pasting things back and forth. Turned on window titles and screen looks during onboarding, and picked consulting and policy as career goals.",
+      "shows": "What the coach learns from how you work: tips and ready-made prompts for the app you already have, a never-read list, and cards that wait while you're writing. No new apps all day.",
+      "color": "teal",
+      "prefs": {
+        "mainHub": "chatgpt",
+        "freeOnly": false,
+        "selfReported": [],
+        "notForMe": [],
+        "dailyCap": 3,
+        "careers": [
+          "consulting",
+          "policy"
+        ],
+        "recruitingNow": true,
+        "windowTitles": true,
+        "screenLooks": true,
+        "newToolsPerWeek": 1
+      },
+      "apps": [
+        {
+          "name": "ChatGPT",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "Microsoft Word",
+          "daysSinceUsed": 0
+        },
+        {
+          "name": "Granola",
+          "daysSinceUsed": 3
+        },
+        {
+          "name": "zoom.us",
+          "daysSinceUsed": 1
+        }
+      ],
+      "history": [
+        {
+          "daysAgo": 3,
+          "event": "later",
+          "tool": "chatgpt-app",
+          "kind": "coach",
+          "app": "com.microsoft.Word"
+        },
+        {
+          "daysAgo": 5,
+          "event": "dismissed",
+          "tool": "grammarly",
+          "kind": "setUp",
+          "app": "com.microsoft.Word"
+        },
+        {
+          "daysAgo": 4,
+          "event": "tip_opened",
+          "tool": "chatgpt-app",
+          "kind": "tip",
+          "workflow": "reading-quiz",
+          "app": "com.apple.Preview"
+        }
+      ],
+      "steps": [
+        {
+          "at": "09:10",
+          "type": "screen",
+          "bundleID": "com.microsoft.Word",
+          "switches": 6,
+          "glimpse": true,
+          "dwell": 3,
+          "narration": "Rory keeps pasting paragraphs between ChatGPT and Word. The coach looks at the letter on the Mac and keeps one line about it. It has a tip, but Rory has put off cards in Word before, so it waits. Open the menu to show what it learned.",
+          "scene": [
+            {
+              "app": "chatgpt",
+              "detail": "Can you make this sound more confident? \"At the nonprofit I helped analyze eviction filings across four neighborhoods.\"",
+              "flag": "shuttle"
+            },
+            {
+              "app": "word",
+              "title": "Cover letter - McKinsey.docx",
+              "detail": "coverMcKinsey"
+            }
+          ]
+        },
+        {
+          "at": "09:40",
+          "type": "screen",
+          "bundleID": "com.openai.codex",
+          "switches": 1,
+          "click": "setUp",
+          "narration": "Rory leaves Word for ChatGPT, so the waiting tip shows up. It's a workflow for the app Rory already pays for, and the prompt already says McKinsey. Click Show me, then Copy prompt.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Cover letter - McKinsey.docx",
+              "detail": "coverMcKinsey"
+            },
+            {
+              "app": "chatgpt",
+              "detail": "Can you make this sound more confident? \"At the nonprofit I helped analyze eviction filings across four neighborhoods.\"",
+              "flag": "shuttle"
+            }
+          ]
+        },
+        {
+          "at": "11:20",
+          "type": "screen",
+          "bundleID": "com.apple.Safari",
+          "glimpse": true,
+          "dwell": 4,
+          "click": "setUp",
+          "narration": "Rory is reading an alum's profile, and the calendar has a McKinsey coffee chat at noon. Rory picked consulting as a career goal, so the prompt asks consulting questions. No new app, just a better way to use ChatGPT.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Cover letter - McKinsey.docx",
+              "detail": "coverMcKinsey"
+            },
+            {
+              "app": "safari",
+              "detail": "profile:Alex Chen|Engagement Manager at McKinsey & Company|Washington, DC|linkedin.com/in/alexchen-yale"
+            }
+          ]
+        },
+        {
+          "at": "11:45",
+          "type": "calendar",
+          "title": "Coffee chat w/ Yale alum at McKinsey",
+          "startsAt": "12:00",
+          "narration": "The coffee chat itself is covered. Rory already uses Granola, so there's no card.",
+          "scene": [
+            {
+              "app": "calendar"
+            },
+            {
+              "app": "safari",
+              "detail": "profile:Alex Chen|Engagement Manager at McKinsey & Company|Washington, DC|linkedin.com/in/alexchen-yale"
+            }
+          ]
+        },
+        {
+          "at": "13:00",
+          "type": "screen",
+          "bundleID": "com.apple.Passwords",
+          "glimpse": true,
+          "dwell": 2,
+          "narration": "Rory opens Passwords. It's on the never-read list, so the coach doesn't take a picture at all, and nothing pops up while it's open.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Cover letter - McKinsey.docx",
+              "detail": "coverMcKinsey"
+            },
+            {
+              "app": "passwords"
+            }
+          ]
+        },
+        {
+          "at": "14:30",
+          "type": "screen",
+          "bundleID": "com.apple.Safari",
+          "glimpse": true,
+          "dwell": 5,
+          "click": "setUp",
+          "narration": "Now Rory is reading the McKinsey posting. The coach remembers the letter from this morning, by its label only, and offers a check of the letter against the posting. That's the third card today, and still no new app.",
+          "scene": [
+            {
+              "app": "word",
+              "title": "Cover letter - McKinsey.docx",
+              "detail": "coverMcKinsey"
+            },
+            {
+              "app": "safari",
+              "detail": "posting:McKinsey & Company|Business Analyst Intern, Summer 2027|Washington, DC and other offices|mckinsey.com/careers"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

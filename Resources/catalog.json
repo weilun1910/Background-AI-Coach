@@ -1,7 +1,7 @@
 {
-  "version": "2026-10-28-proto",
-  "publishedAt": "2026-10-28",
-  "note": "Prototype catalog picked by hand. It stands in for the daily cloud catalog. Facts checked on 2026-10-15; see research/external/catalog-fact-check-2026-10-15.md. Claude Slides and the Figma connector in Claude were added on 2026-10-28; see research/external/claude-skills-connectors-2026-10-28.md.",
+  "version": "2026-10-30-screen",
+  "publishedAt": "2026-10-30",
+  "note": "Prototype catalog picked by hand. It stands in for the daily cloud catalog. Facts checked on 2026-10-15; see research/external/catalog-fact-check-2026-10-15.md. Claude Slides and the Figma connector in Claude were added on 2026-10-28; see research/external/claude-skills-connectors-2026-10-28.md. Workflows and the Gemini app entry added 2026-10-30, checked in research/external/workflow-tips-fact-check-2026-10-30.md.",
   "buckets": [
     {
       "id": "meeting-notes",
@@ -191,7 +191,10 @@
     },
     {
       "id": "zoom-ai-companion",
-      "notFor": ["networking", "interview"],
+      "notFor": [
+        "networking",
+        "interview"
+      ],
       "name": "Zoom meeting summary",
       "vendor": "Zoom",
       "kind": "feature",
@@ -391,7 +394,21 @@
           "Ask which two answers were weakest and why."
         ]
       },
-      "source": "https://help.openai.com/en/articles/20001274-chatgpt-voice"
+      "source": "https://help.openai.com/en/articles/20001274-chatgpt-voice",
+      "careerWalkthrough": {
+        "consulting": [
+          "Open ChatGPT and paste in the job description.",
+          "Say: give me a consulting case interview, one step at a time. Wait for my answer before you give me the next piece of data.",
+          "Click the Voice icon and talk through your structure out loud, the way you would with an interviewer.",
+          "Ask which part of your structure was weakest, and why."
+        ],
+        "finance": [
+          "Open ChatGPT and paste in the job description.",
+          "Say: interview me for this role with a mix of technical and behavioral questions, one at a time, and push back when I'm vague.",
+          "Click the Voice icon and answer out loud for 15 minutes. On the free plan you may run out of voice time.",
+          "Ask which two answers were weakest, and why."
+        ]
+      }
     },
     {
       "id": "claude-mock-interview",
@@ -433,7 +450,15 @@
           "At the end, ask for the one habit that hurt your answers most."
         ]
       },
-      "source": "https://claude.ai"
+      "source": "https://claude.ai",
+      "careerWalkthrough": {
+        "consulting": [
+          "Paste in the job description and your resume.",
+          "Say: give me a consulting case interview, one step at a time. Wait for my answer before you give me the next piece of data.",
+          "Type your structure the way you'd say it out loud.",
+          "At the end, ask which part of your structure was weakest, and why."
+        ]
+      }
     },
     {
       "id": "gemini-live-interview",
@@ -1402,6 +1427,190 @@
         ]
       },
       "source": "https://openai.com/codex"
+    },
+    {
+      "id": "gemini-app",
+      "name": "Gemini",
+      "vendor": "Google",
+      "kind": "app",
+      "hub": "gemini",
+      "symbol": "sparkle",
+      "buckets": [],
+      "scores": {},
+      "evidence": "onPaper",
+      "free": true,
+      "cost": "Free plan, which mostly uses Google's lightest model. Paid plans start at $4.99 a month and let you pick stronger models and work with longer files.",
+      "dataAccess": "What you paste or upload into a chat.",
+      "why": "Google's AI assistant. Tips can run in it when it's your main AI app.",
+      "detect": {
+        "appNames": [
+          "Gemini"
+        ]
+      },
+      "setup": {
+        "method": "openURL",
+        "url": "https://gemini.google.com",
+        "steps": [
+          "Open Gemini and sign in with your Google account."
+        ],
+        "minutes": 1
+      },
+      "walkthrough": {
+        "default": [
+          "Open Gemini and start a new chat."
+        ]
+      },
+      "source": "https://gemini.google/subscriptions/"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "feedback-in-one-go",
+      "name": "Get all the feedback in one go",
+      "habit": "ai-doc-shuttle",
+      "summary": "Paste the whole draft once and ask for a list of fixes, so you can work through them in your document instead of pasting back and forth.",
+      "why": "One pass over the whole draft gives better feedback than a paragraph at a time, and you stay the one writing.",
+      "hubs": [
+        "chatgpt",
+        "claude",
+        "gemini"
+      ],
+      "steps": [
+        "Copy your whole draft, and the job posting if there is one.",
+        "Paste both into one message, under the prompt below.",
+        "Work through the list in your document, writing each fix yourself.",
+        "When you're done, paste the new version once for a last check."
+      ],
+      "prompt": "Here's my {doc} for {org}, and the job posting it's for. Don't rewrite anything. Give me a table with three columns: the sentence, what's weak about it, and a question that would help me fix it myself. Start with the five that matter most.",
+      "careerPrompts": {
+        "consulting": "Also point out anywhere I describe a task instead of a result.",
+        "finance": "Also point out anywhere I'm vague about numbers or about what I owned.",
+        "tech": "Also flag anything that sounds like a buzzword instead of something I built."
+      },
+      "bucket": "writing-feedback",
+      "score": 0.8
+    },
+    {
+      "id": "coffee-chat-questions",
+      "name": "Prep questions only they can answer",
+      "habit": "coffee-chat-prep",
+      "summary": "Turn what's on their public profile into a few sharp questions, in about five minutes.",
+      "why": "Specific questions are what an alum remembers, and they show you did your homework without reading their resume back to them.",
+      "hubs": [
+        "chatgpt",
+        "claude",
+        "gemini"
+      ],
+      "steps": [
+        "Copy the parts of their profile you'd bring up, like their team and past roles. Leave out anything personal.",
+        "Paste them under the prompt below.",
+        "Pick two or three questions and put them in your own words.",
+        "Right after the chat, jot down what they said, so your thank-you note can mention it."
+      ],
+      "prompt": "I have a 30-minute coffee chat with {role} at {org}. Here's what's on their public profile: [paste it here]. Give me five questions that show I did my homework and that the company's website can't answer. Then give me one way to ask for advice at the end without asking for a referral.",
+      "careerPrompts": {
+        "consulting": "Include one question about how they got staffed on their first cases, and one about what they'd do differently in their first year.",
+        "finance": "Include one question about what their first year on a deal team was really like.",
+        "tech": "Include one question about how a product decision they worked on actually got made.",
+        "design": "Include one question about what they look for in a student's portfolio.",
+        "policy": "Include one question about how their work actually reaches the person making the decision."
+      },
+      "score": 0.8
+    },
+    {
+      "id": "posting-check",
+      "name": "Check your letter against the posting",
+      "habit": "posting-after-draft",
+      "summary": "Ask which things the posting cares about that your letter doesn't show yet.",
+      "why": "Recruiters read for what the posting asks for. This finds the gaps without writing the letter for you.",
+      "hubs": [
+        "chatgpt",
+        "claude",
+        "gemini"
+      ],
+      "steps": [
+        "Copy the posting's main sections, like what you'll do and who they're looking for.",
+        "Paste the posting and your letter under the prompt below.",
+        "For each gap, think of a real example and write the sentence yourself."
+      ],
+      "prompt": "Here's the {org} job posting and my cover letter. Don't rewrite my letter. List the three things the posting asks for most. For each one, quote the sentence in my letter that shows it, or say it's missing. If it's missing, ask me a question about my experience that could fill the gap.",
+      "careerPrompts": {
+        "consulting": "Also tell me which sentences would fit any consulting firm, so I can make them specific to {org}.",
+        "finance": "Also tell me which sentences would fit any bank, so I can make them specific to {org}."
+      },
+      "bucket": "writing-feedback",
+      "score": 0.85
+    },
+    {
+      "id": "reading-quiz",
+      "name": "Turn the reading into a quick quiz",
+      "habit": "long-reading",
+      "summary": "Get the main argument with the passage it comes from, then three questions to check you've got it.",
+      "why": "Answering questions sticks better than rereading, and the quote lets you check the AI didn't make the argument up.",
+      "hubs": [
+        "chatgpt",
+        "claude",
+        "gemini"
+      ],
+      "tools": [
+        "notebooklm"
+      ],
+      "steps": [
+        "Upload the PDF, or paste the text. If the reading is very long, paste one section at a time.",
+        "Use the prompt below.",
+        "Answer each question before you look back at the reading.",
+        "If an answer surprises you, find the quoted passage and read it yourself."
+      ],
+      "prompt": "Here's a reading for my class. First give me its main argument in two sentences, and quote the passage you're relying on. Then ask me three questions, one at a time, to check I understood it. Wait for my answer each time and tell me what I missed.",
+      "careerPrompts": {
+        "research": "Make the last question about how the author's evidence could be challenged."
+      },
+      "bucket": "research",
+      "score": 0.75
+    },
+    {
+      "id": "outline-first",
+      "name": "Outline first, then build the slides",
+      "habit": "blank-slides",
+      "summary": "Get a slide-by-slide outline with one takeaway per slide, then build the deck yourself.",
+      "why": "Starting from a list of takeaways is faster than a blank slide, and the deck still looks like yours.",
+      "hubs": [
+        "chatgpt",
+        "claude",
+        "gemini"
+      ],
+      "steps": [
+        "Paste your notes, or the assignment, under the prompt below.",
+        "Edit the outline until every takeaway sounds like you.",
+        "Build one slide per takeaway, with the takeaway as its title."
+      ],
+      "prompt": "I'm making a slide deck. Here are my notes: [paste them here]. Give me a slide-by-slide outline with eight slides at most. For each slide, give a one-line takeaway and say what chart or picture would back it up.",
+      "careerPrompts": {
+        "consulting": "Write each takeaway as a full-sentence action title, the way consulting slides do."
+      },
+      "bucket": "slides",
+      "score": 0.75
+    },
+    {
+      "id": "save-your-background",
+      "name": "Give your AI your background once",
+      "habit": "resume-repaste",
+      "summary": "Save the basics about you in your AI app, so a new chat doesn't need your resume pasted in.",
+      "why": "It saves pasting the same thing every time, and answers start out knowing what you're aiming for.",
+      "hubs": [
+        "chatgpt",
+        "claude",
+        "gemini"
+      ],
+      "steps": [
+        "Use the prompt below to turn your resume into four short lines about you.",
+        "Open your AI app's settings and find where it lets you save things about you. In ChatGPT it's custom instructions, under Personalization. In Claude it's Instructions for Claude, under Your Claude (or Account in older versions). In Gemini it's Instructions for Gemini, under Personal Intelligence, and it only works when you're signed in with a personal Google account.",
+        "Paste the four lines there. Leave out anything you wouldn't put on a public profile.",
+        "Start a new chat and check it uses what you saved."
+      ],
+      "prompt": "Here's my resume: [paste it here]. Write four short lines about me that I can save in my AI app's settings: my year, my major, the roles I'm going for, and how I like to get feedback. Leave out my contact details and grades.",
+      "score": 0.7,
+      "source": "research/external/workflow-tips-fact-check-2026-10-30.md"
     }
   ]
 }

@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// First-run setup: what it does, your AI setup, what's off limits,
-/// calendar access, then your coverage.
+/// First-run setup: what it does, your AI setup, your career goals, what's
+/// off limits, what it looks at, then your coverage.
 struct OnboardingView: View {
     @ObservedObject var model: AppModel
     @State private var page: Int
     let close: () -> Void
 
-    static let pageCount = 5
+    static let pageCount = 6
 
     init(model: AppModel, startPage: Int = 0, close: @escaping () -> Void) {
         self.model = model
@@ -22,8 +22,9 @@ struct OnboardingView: View {
                     switch page {
                     case 0: welcome
                     case 1: yourSetup
-                    case 2: notForMe
-                    case 3: permissions
+                    case 2: careers
+                    case 3: notForMe
+                    case 4: permissions
                     default: summary
                     }
                 }
@@ -59,7 +60,7 @@ struct OnboardingView: View {
             }
             .padding(16)
         }
-        .frame(width: 580, height: 600)
+        .frame(width: 580, height: 640)
         .background(Theme.surface)
     }
 
@@ -86,12 +87,13 @@ struct OnboardingView: View {
                 InfoLine(symbol: "square.dashed", text: "If you don't have a good tool for that moment, I suggest one and help you set it up.", color: Theme.accent)
                 InfoLine(symbol: "hand.wave", text: "If you have one but haven't used it, I show you how in a minute.", color: Theme.accent)
                 InfoLine(symbol: "moon.zzz", text: "If you're already covered, I stay quiet. At most one suggestion a day.", color: Theme.accent)
+                InfoLine(symbol: "lightbulb", text: "If you turn it on, I also notice how you work and suggest better ways to use apps you already have.", color: Theme.accent)
             }
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "lock.shield").font(.title3).foregroundStyle(Theme.accent)
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Your stuff stays on this Mac").font(.callout.weight(.semibold))
-                    Text("Your calendar and app activity are read here, by Apple's on-device model when your Mac has it. I download a public list of tools once a day. Nothing about you is uploaded.")
+                    Text("Your calendar, your app activity and anything I read on your screen are read here, by Apple's on-device model when your Mac has it. I download a public list of tools once a day. Nothing about you is uploaded.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -148,6 +150,16 @@ struct OnboardingView: View {
         }
     }
 
+    private var careers: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            title("What are you working toward?",
+                  "Pick any that fit. Tips for your field rank higher, and some prompts have a version for it, like case questions for consulting.")
+            CareerPicker(model: model)
+            Toggle("I'm recruiting right now", isOn: $model.prefs.recruitingNow)
+                .toggleStyle(.checkbox)
+        }
+    }
+
     private var notForMe: some View {
         VStack(alignment: .leading, spacing: 20) {
             title("Anything you'd rather do yourself?",
@@ -168,7 +180,7 @@ struct OnboardingView: View {
 
     private var permissions: some View {
         VStack(alignment: .leading, spacing: 20) {
-            title("What I look at", "Two things, and you can turn either off later.")
+            title("What I look at", "Two things to start. Two more if you want tips about how you work. You can turn any of them off later.")
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
@@ -200,6 +212,12 @@ struct OnboardingView: View {
                     Spacer()
                     Chip(text: "No prompt needed", color: Theme.quiet)
                 }
+            }
+            .padding(14)
+            .background(Theme.raised, in: RoundedRectangle(cornerRadius: Theme.innerRadius, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 10) {
+                ScreenSignalRows(model: model)
             }
             .padding(14)
             .background(Theme.raised, in: RoundedRectangle(cornerRadius: Theme.innerRadius, style: .continuous))

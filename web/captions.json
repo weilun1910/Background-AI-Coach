@@ -103,5 +103,40 @@
       "lead": "Writing seminar essay due tonight.",
       "outcome": "Another gap, another wait. Grace had several gaps today and saw one card."
     }
+  ],
+  "rory": [
+    {
+      "lead": "Rory is writing a McKinsey cover letter and keeps pasting paragraphs back and forth between ChatGPT and Word.",
+      "look": "The coach takes a look at the letter, on the Mac. It keeps one line, \"writing a cover letter for McKinsey in Word\", and drops the picture.",
+      "outcome": "The coach has a tip, but it waits. Rory put off two cards while writing in Word last week, so it learned not to interrupt there.",
+      "title": "Pasting between ChatGPT and Word"
+    },
+    {
+      "lead": "Rory switches from Word to ChatGPT.",
+      "outcome": "Rory now has one prompt that gets feedback on the whole letter at once, in the app Rory already pays for. Nothing new to install.",
+      "title": "Leaving Word for ChatGPT"
+    },
+    {
+      "lead": "Rory is looking at an alum's profile. The calendar has a McKinsey coffee chat at noon.",
+      "look": "The coach takes a look at the page, on the Mac. It keeps that this is a profile and the role, and leaves out the person's name.",
+      "outcome": "Rory picked consulting as a career goal, so the prompt asks consulting questions, like how the alum got staffed on their first cases.",
+      "title": "Reading an alum's profile before a coffee chat"
+    },
+    {
+      "lead": "The coffee chat with the McKinsey alum is in 15 minutes.",
+      "outcome": "Nothing. Rory already uses Granola for notes, so there's no gap."
+    },
+    {
+      "lead": "Rory opens Passwords.",
+      "outcome": "The coach didn't look. Passwords is on the never-read list, along with banking, messages, private browsing and password fields. Nothing pops up there either.",
+      "title": "Opening Passwords",
+      "look": "The coach checks its never-read list before it looks at anything."
+    },
+    {
+      "lead": "Rory is reading the McKinsey job posting.",
+      "look": "The coach takes a look at the posting. It remembers the letter from this morning by its label only, not its text.",
+      "outcome": "Rory can now check the letter against the posting without letting ChatGPT rewrite it. That's three tips today and no new apps.",
+      "title": "Reading the McKinsey posting"
+    }
   ]
 }
