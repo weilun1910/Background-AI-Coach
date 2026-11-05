@@ -14,7 +14,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 OUT="${RECOMMENDER_BUILD_DIR:-$HOME/Library/Developer/Background AI Coach}"
-APP="$OUT/Background AI Coach.app"
+APP="$OUT/Coachmark.app"
 SUFFIX="${WEB_NAME:+-$WEB_NAME}"
 RAW="$OUT/web-frames$SUFFIX"
 DATA="$OUT/web-data$SUFFIX"

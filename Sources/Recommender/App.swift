@@ -210,7 +210,7 @@ final class WindowManager {
                 backing: .buffered,
                 defer: false
             )
-            w.title = "Background AI Coach: Persona demo"
+            w.title = "Coachmark: Persona demo"
             w.isReleasedWhenClosed = false
             w.contentViewController = NSHostingController(rootView: PersonaDemoView(demo: demo, model: model))
             if let screen = NSScreen.main {
@@ -232,7 +232,7 @@ final class WindowManager {
                 backing: .buffered,
                 defer: false
             )
-            w.title = "Background AI Coach Settings"
+            w.title = "Coachmark Settings"
             w.isReleasedWhenClosed = false
             w.contentViewController = NSHostingController(rootView: SettingsView(model: model))
             w.center()

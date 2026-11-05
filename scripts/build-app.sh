@@ -8,7 +8,7 @@ cd "$(dirname "$0")/.."
 CONFIG="${CONFIG:-debug}"
 OUT="${RECOMMENDER_BUILD_DIR:-$HOME/Library/Developer/Background AI Coach}"
 SCRATCH="$OUT/swiftpm"
-APP="$OUT/Background AI Coach.app"
+APP="$OUT/Coachmark.app"
 mkdir -p "$OUT"
 
 swift build -c "$CONFIG" --scratch-path "$SCRATCH"
@@ -20,6 +20,7 @@ cp "$BIN_DIR/Recommender" "$APP/Contents/MacOS/Recommender"
 cp Support/Info.plist "$APP/Contents/Info.plist"
 cp Resources/catalog.json "$APP/Contents/Resources/catalog.json"
 cp Resources/personas.json "$APP/Contents/Resources/personas.json"
+[ -f Resources/AppIcon.icns ] && cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
 # Sign with an Apple Development identity when there is one, so macOS keeps
 # the calendar permission between rebuilds. Otherwise sign ad hoc.

@@ -10,7 +10,7 @@ final class Store {
             dir = URL(fileURLWithPath: custom, isDirectory: true)
         } else if AppModel.personaLaunch {
             // The persona demo never writes into your real settings.
-            dir = FileManager.default.temporaryDirectory.appendingPathComponent("Background AI Coach Personas", isDirectory: true)
+            dir = FileManager.default.temporaryDirectory.appendingPathComponent("Coachmark Personas", isDirectory: true)
         } else {
             dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
                 .appendingPathComponent("Background AI Coach", isDirectory: true)

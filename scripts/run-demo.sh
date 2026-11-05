@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 OUT="${RECOMMENDER_BUILD_DIR:-$HOME/Library/Developer/Background AI Coach}"
-APP="$OUT/Background AI Coach.app"
+APP="$OUT/Coachmark.app"
 [ -d "$APP" ] || ./scripts/build-app.sh
 
 DATA="$OUT/demo-data"

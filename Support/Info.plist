@@ -3,11 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.weilun1910.background-ai-coach</string>
+	<string>com.weilun1910.coachmark</string>
 	<key>CFBundleName</key>
-	<string>Background AI Coach</string>
+	<string>Coachmark</string>
 	<key>CFBundleDisplayName</key>
-	<string>Background AI Coach</string>
+	<string>Coachmark</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleExecutable</key>
 	<string>Recommender</string>
 	<key>CFBundlePackageType</key>

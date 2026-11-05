@@ -63,7 +63,7 @@ function renderLock(message = "") {
   document.title = "Survey Results";
   root.innerHTML = `
     <main class="lock">
-      <div class="eyebrow">${sparkle()} Background AI Coach</div>
+      <div class="eyebrow">${sparkle()} Coachmark</div>
       <h1>Survey results</h1>
       <p class="sub">Enter the results key to see what testers said.</p>
       <form id="lock">
@@ -97,7 +97,7 @@ async function load() {
       cache: "no-store",
     });
     if (response.status === 401 && sharing) {
-      root.innerHTML = `<main class="lock"><div class="eyebrow">${sparkle()} Background AI Coach</div><h1>Survey results</h1><p class="sub">This link doesn't work anymore. Ask Felix for a new one.</p></main>`;
+      root.innerHTML = `<main class="lock"><div class="eyebrow">${sparkle()} Coachmark</div><h1>Survey results</h1><p class="sub">This link doesn't work anymore. Ask Felix for a new one.</p></main>`;
       return;
     }
     if (response.status === 401) {
@@ -128,7 +128,7 @@ function render(warning = "") {
 
   root.innerHTML = `
     <main class="report">
-      <div class="eyebrow">${sparkle()} Background AI Coach</div>
+      <div class="eyebrow">${sparkle()} Coachmark</div>
       <div class="report-head">
         <div>
           <h1>Survey results${showTests ? ` <span class="test-tag">Test answers</span>` : ""}</h1>
