@@ -192,7 +192,7 @@ function render() {
 }
 
 function renderHome() {
-  document.title = "Background AI Coach";
+  document.title = "Coachmark";
   const done = saved.finished.length;
   let status;
   if (saved.submitted) {
@@ -211,10 +211,10 @@ function renderHome() {
 
   app.innerHTML = `
     <main class="home">
-      <div class="eyebrow">${sparkle()} Background AI Coach</div>
-      <h1>Try a day with Background AI Coach</h1>
+      <div class="eyebrow">${sparkle()} Coachmark</div>
+      <h1>Try a day with Coachmark</h1>
       <div class="intro">
-        <p>Background AI Coach is a Mac app that lives in your menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes or a midterm tomorrow. If you don't have a good tool for that moment, it suggests one and sets it up. If you already have one you never open, it shows you how to use it. If you're covered, it stays quiet.</p>
+        <p>Coachmark is a Mac app that lives in your menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes or a midterm tomorrow. If you don't have a good tool for that moment, it suggests one and sets it up. If you already have one you never open, it shows you how to use it. If you're covered, it stays quiet.</p>
         <p>Here you'll step through made-up students' days on their Mac. What the app does at each moment was decided by the real app. When a card shows up, pick what you'd actually do if you were them. Try ${plural(survey.unlockAfter, "student")}, starting with the one most like you, and then there's a short survey.</p>
       </div>
       ${status}
@@ -242,7 +242,7 @@ function renderHome() {
 function renderWalk() {
   const slide = person.slides[index];
   const total = person.slides.length;
-  document.title = `${person.name}'s day | Background AI Coach`;
+  document.title = `${person.name}'s day | Coachmark`;
 
   let walk = app.querySelector(".walk");
   if (!walk || walk.dataset.person !== person.id) {
@@ -334,7 +334,7 @@ function choicePanel(slide) {
 
 function renderSummary() {
   const cards = person.slides.map((s, i) => ({ s, i })).filter(({ s }) => s.type === "choice");
-  document.title = `${person.name}'s day | Background AI Coach`;
+  document.title = `${person.name}'s day | Coachmark`;
 
   let actions;
   if (surveyOpen()) {
@@ -359,7 +359,7 @@ function renderSummary() {
 
   app.innerHTML = `
     <main class="summary">
-      <div class="eyebrow">${sparkle()} Background AI Coach</div>
+      <div class="eyebrow">${sparkle()} Coachmark</div>
       <h1>That's ${esc(person.name)}'s day</h1>
       <p class="sub">${cards.length === 1 ? "One card showed up." : `${cards.length} cards showed up.`} Here's what you picked.</p>
       <ul class="picks">
@@ -382,10 +382,10 @@ function renderSummary() {
 // MARK: Survey
 
 function renderSurvey() {
-  document.title = "A few questions | Background AI Coach";
+  document.title = "A few questions | Coachmark";
   app.innerHTML = `
     <main class="survey">
-      <div class="eyebrow">${sparkle()} Background AI Coach</div>
+      <div class="eyebrow">${sparkle()} Coachmark</div>
       <h1>A few quick questions</h1>
       <p class="sub">${esc(survey.intro)}</p>
       <form id="survey" novalidate>
@@ -521,11 +521,11 @@ async function send(event) {
 }
 
 function renderThanks() {
-  document.title = "Thanks | Background AI Coach";
+  document.title = "Thanks | Coachmark";
   const left = people.length - saved.finished.length;
   app.innerHTML = `
     <main class="summary">
-      <div class="eyebrow">${sparkle()} Background AI Coach</div>
+      <div class="eyebrow">${sparkle()} Coachmark</div>
       <h1>Thanks, that really helps</h1>
       <p class="sub">Your answers and card picks are in.${left ? ` If you're curious, there ${left === 1 ? "is one student" : `are ${plural(left, "student")}`} you haven't tried.` : ""}</p>
       <div class="actions">

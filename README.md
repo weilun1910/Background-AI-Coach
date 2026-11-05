@@ -1,10 +1,12 @@
-# Background AI Coach
+<img src="docs/icon.png" width="112" alt="Coachmark app icon">
+
+# Coachmark
 
 **This repo is a proof of concept.** The best way to see it is the live demo:
 
 ### [Try the demo: background-ai-coach.vercel.app](https://background-ai-coach.vercel.app)
 
-Background AI Coach is a Mac app that lives in the menu bar and notices the moments where AI would actually help, like a coffee chat in 15 minutes, a mock interview tomorrow or a deadline tonight. Then it shows you the best way to handle that moment with the AI tools you already have.
+Coachmark is a Mac app that lives in the menu bar and notices the moments where AI would actually help, like a coffee chat in 15 minutes, a mock interview tomorrow or a deadline tonight. Then it shows you the best way to handle that moment with the AI tools you already have. The name comes from coach marks, the small hint bubbles that point at a feature to teach it right where you use it.
 
 Most of the time that means a newer way to use an app you already use. It might be connecting Claude to Figma so it can read your real designs, adding an MCP server to Claude Code, keeping a course's readings in a Claude Project, or running a mock interview in ChatGPT's voice mode. Features like these keep shipping inside the apps students already use, and they're easy to miss. The app only suggests a new app when nothing you have covers the moment, and if you're already covered, it stays quiet.
 

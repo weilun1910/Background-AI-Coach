@@ -26,7 +26,7 @@ struct MenuContentView: View {
                 .font(.title3)
                 .foregroundStyle(Theme.accent)
             VStack(alignment: .leading, spacing: 1) {
-                Text("Background AI Coach").font(.headline)
+                Text("Coachmark").font(.headline)
                 Text(model.detector.activeDetector == .onDeviceModel ? "Using Apple's on-device model" : "Using keyword rules")
                     .font(.caption)
                     .foregroundStyle(.secondary)

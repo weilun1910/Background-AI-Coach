@@ -1,5 +1,5 @@
 {
-  "name": "background-ai-coach-walkthrough",
+  "name": "coachmark-walkthrough",
   "private": true,
   "type": "module",
   "description": "The web walkthrough's survey function. The page itself is static.",
