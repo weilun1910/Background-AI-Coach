@@ -1,70 +1,18 @@
 # Background AI Coach
 
-My solution prototype for the ENAS 3110 Solution / Design milestone, for AI-forward, non-technical Yale students getting ready for internships and jobs.
+**This is a proof of concept.** It's an early test build of the idea. The code is rough and isn't meant to be installed. The best way to see it is the live demo:
 
-It's a Mac app that lives in the menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes, a mock interview tomorrow or a deadline tonight. If you don't have a good tool for that moment, it suggests one and walks you through setting it up. If you already own one and haven't been using it, it shows you how in about a minute. If you're already covered, it stays quiet.
+### [Try the demo: background-ai-coach.vercel.app](https://background-ai-coach.vercel.app)
 
+Background AI Coach is a Mac app that lives in the menu bar and notices the moments where an AI tool would actually help, like a coffee chat in 15 minutes, a mock interview tomorrow or a deadline tonight. If you don't have a good tool for that moment, it suggests one and sets it up for you. If you already own one and haven't been using it, it shows you how in about a minute. If you're already covered, it stays quiet.
 
-## How it works
+It's designed for college students who are curious about AI but aren't technical, and who are getting ready for internships and jobs.
 
-The app runs the same loop every time something happens on your Mac.
+## The demo
 
-1. First it notices a moment. It reads the titles and times of your calendar events and notices which app is in front. Apple's on-device model reads each event title and decides what kind of moment it is, such as a coffee chat, an interview, an exam or a presentation. Going back and forth to the same app counts too, so switching to Figma four times in 15 minutes is a design moment.
-2. Then it checks what you already have. Tools are grouped into eight areas, like AI meeting notes, interview practice and study prep. For each area the app works out whether you have nothing, own a tool you haven't opened in 30 days, or already use something. It can see your installed apps and your Claude Code setup. Websites and features inside other apps can't be seen from the Mac, so you tick those during onboarding.
-3. If the area is empty, it suggests the tool that fits best. If you own something you haven't been using, it coaches you on that instead of selling you something new. If you're covered, or you've said "not for me", it does nothing.
-4. Timing matters as much as the suggestion. By default you get at most one card a day, and nothing pops up while you're paused or while Zoom, Teams or FaceTime is the app in front. A held card waits in the menu bar and shows up at the next calm moment.
-5. The card explains why this tool, what it costs, what it can see, and any consent note, like asking before you record someone. "Set it up" installs the app through Homebrew where it can, adds MCP servers to Claude Code, or opens the right page with a short checklist. A quick walkthrough for that exact moment comes after.
-6. Finally, it keeps a small log on your Mac of every card shown, accepted, dismissed, or followed by you reopening the tool within a week.
+The demo plays a day on a made-up student's Mac. You pick the student most like you and step through their day. Each time the app shows a card, you choose what you'd do: set it up, "Later" or "Not for me". After two students there's a short survey.
 
-None of this leaves your Mac. Event titles are read by Apple's model on the device, or by keyword rules on Macs without it, and nothing about you is uploaded.
-
-The list of tools is a catalog of 29 tools across the eight areas, written by hand in `Resources/catalog.json`. In the full design a shared service would refresh that list every day. Here it's picked by hand, and its prices, plans and links were checked against vendor pages on Oct 15, 2026.
-
-The system diagram is on the [FigJam board](https://www.figma.com/board/DanmId5kR63iVwQ1qfaFuu). This prototype covers the "Student Mac" half of it.
-
-## Install and try it
-
-You need a Mac with macOS 14 or later and Xcode's command-line tools (`xcode-select --install`). To have Apple's model read event titles, you also need an M1 or later Mac on macOS 26 or later with Apple Intelligence turned on. Without it the app uses keyword rules, which work but miss more.
-
-Get the code and build the app:
-
-```bash
-git clone https://github.com/weilun1910/Background-AI-Coach.git
-cd Background-AI-Coach
-./scripts/build-app.sh
-```
-
-The build goes to `~/Library/Developer/Background AI Coach` on your Mac. There are four ways to run it.
-
-| Command | What you get |
-| --- | --- |
-| `./scripts/run-stage.sh` | The full-screen demo with five pretend students. This is the one to show people. |
-| `./scripts/run-demo.sh` | The real app in demo mode. It starts at onboarding, pretends your Mac is fresh, and never installs anything. |
-| `./scripts/run.sh` | The real app on your real Mac. "Install it for me" really runs Homebrew. |
-| `./scripts/run-personas.sh` | The five pretend students with a presenter window on the left, without taking over the screen. |
-
-In demo and real mode, click the sparkle icon in the menu bar. "Try a moment" runs a sample event, like a coffee chat in 15 minutes, through the whole app, including Apple's model. In real mode you'll be asked to allow calendar access the first time. Settings has a button that opens the app's data folder.
-
-## How the demo works
-
-`./scripts/run-stage.sh` turns your screen into a made-up student's Mac. It has their wallpaper, their menu bar and clock, a dock with their apps, and real-looking windows for apps like Word, Zoom, Figma, ChatGPT and Calendar. The app deciding what to show is the real one. Only the student's apps, calendar and clock are pretend.
-
-Click the screen once so it has focus, then use the keyboard.
-
-| Key | What it does |
-| --- | --- |
-| Right arrow or space | Next step |
-| Left arrow | Back one step |
-| 1 to 5 | Switch student |
-| R | Restart the day |
-| N | Show or hide the presenter notes at the bottom |
-| H | Show or hide the key hints |
-| Esc | Switch between full screen and a window |
-| Cmd+Q | Quit |
-
-Each moment in a student's day plays in a few steps. Their desktop appears with whatever they're working on. A calendar notification slides in. Then the app's card appears in the corner, and a cursor clicks through setup or "Show me how" until the tool opens on their desktop. When the app stays quiet or holds a card, the cursor opens the menu-bar menu to show what it noticed and why. The notes at the bottom say what to point out at each step.
-
-The five students each show a different part of the product.
+Each student shows a different part of the product.
 
 | Student | Who they are | What their day shows |
 | --- | --- | --- |
@@ -74,81 +22,55 @@ The five students each show a different part of the product.
 | Dev | Cognitive Science junior with tools he never opens | Coaching on Grammarly, Cursor and Gemini that he already has, with no new installs |
 | Grace | First-year with nothing set up | Nothing popping up during a Zoom call, and only one card on a day full of gaps |
 
-The students are made up. Each one mixes patterns from several of our user interviews and doesn't stand for any one person. Their days are in `Resources/personas.json`.
+The students are made up. Each one mixes patterns from several of our user interviews. The decisions in the demo come from the real app logic. Only the students, their apps and their calendars are pretend.
 
-## The web walkthrough
+## The problem
 
-There's also a web version of the full-screen demo, for sending to people who won't build the app. It's live at https://background-ai-coach.vercel.app. It has the same five students and the same screens, rendered from the real app without the presenter notes. Testers start with the student most like them and step through the day. Each time a card shows up, they choose what they'd do: set it up (or "Show me how"), "Later", or "Not for me". After two students there's a short survey, and their answers and card picks are saved to a private Vercel Blob store on the project.
+New AI tools and features come out every week. For a student who isn't technical, it's hard to tell which ones are worth learning, and guessing wrong costs time they don't have. These are the pain points that kept coming up in our interviews.
 
-```bash
-./scripts/build-web.sh
-```
+- There's too much to keep up with. Students told us the hard part is knowing what's out there and which of it is actually good. So they either ignore tools that would help them or spend hours on ones that go nowhere.
+- Hearing about a tool doesn't get anyone to use it. People try something new when it clearly fits a task they're doing right now. Separate tutorials feel like homework, so they get skipped.
+- Setup gets in the way. Finding the right tool, signing up, installing it and configuring it all land right before the thing they needed it for. Many students also told us they won't download another app or pay for another subscription.
+- They already own tools they don't use. A feature inside ChatGPT or Claude, or an app they installed once, sits there because nobody showed them when to reach for it.
+- A bad first try sends them back to doing it by hand. If the first attempt takes more effort than the manual way, they give up on the tool.
+- They don't want something watching them. Privacy came up again and again, from not wanting to give an AI access to their files to distrusting apps that ask for too much.
+- It matters for getting hired. We heard that employers increasingly expect candidates to explain how they've actually used AI, and knowing a tool exists doesn't count as experience.
 
-The site goes to `~/Library/Developer/Background AI Coach/web-dist`. To put it online, log in to Vercel once with `npx vercel login`, then run `npx vercel deploy --prod` from that folder. If only the page, captions or survey changed, `SKIP_RENDER=1 ./scripts/build-web.sh` reuses the last frames and takes seconds.
+## What it does
 
-To read the answers, open https://background-ai-coach.vercel.app/results.html and enter the results key. It's the `RESULTS_KEY` environment variable on the Vercel project. To get the answers out as spreadsheets, run `./scripts/export-survey.sh`. It downloads every response and writes two spreadsheets to `~/Library/Developer/Background AI Coach/survey-export`: one row per tester, and one row per card pick. Opening the site with `?test=1` at the end of the link saves answers under `tests/` instead, so trial runs stay out of the real results. `./scripts/export-survey.sh tests/` exports those.
+Students shouldn't have to go looking for the right tool. The app brings it to them at the moment they need it and handles the setup. It runs the same loop every time something happens on the Mac.
 
-The page is in `web/`:
+1. It notices a moment. It reads the titles and times of your calendar events, and Apple's on-device model decides what kind of moment each one is, like a coffee chat, an interview, an exam or a presentation. Going back and forth to the same app counts too, so switching to Figma four times in 15 minutes is a design moment.
+2. It checks what you already have. Tools are grouped into eight areas: AI meeting notes, interview practice, reading and research, study and exam prep, slide drafting, writing feedback, design and AI coding. For each area it works out whether you have nothing, own something you haven't opened in 30 days, or already use something.
+3. It decides. If the area is empty, it suggests the tool that fits best. If you own something you haven't been using, it coaches you on that before selling you anything new. If you're covered, or you've said "not for me", it does nothing.
+4. It picks the right time. By default you get at most one card a day, and nothing pops up during a call or while you've paused it. A held card waits in the menu bar until the next calm moment.
+5. It shows a card that explains why this tool, what it costs, what it can see, and any consent note, like asking before you record someone.
+6. It sets the tool up for you, then walks you through using it for that exact moment.
+7. It keeps a small log on your Mac of what happened to each card, including whether you came back to the tool within a week.
 
-| File | What it is |
-| --- | --- |
-| `index.html`, `style.css`, `app.js` | The page |
-| `captions.json` | What testers read at each step |
-| `survey.json` | The survey questions, and how many students unlock it |
-| `api/submit.js` | The function that saves a response |
-| `results.html`, `results.js`, `api/results.js` | The private results page and the function behind it |
-| `build.py`, `export_responses.py` | Turn the demo's steps into slides, and responses into CSV |
+## Why it works this way
 
-## What it does today
+Each design choice answers one of the pain points above.
 
-- Reads calendar event titles and times through macOS Calendar, and turns them into moments with Apple's on-device model or keyword rules.
-- Notices repeated switching to Figma, Canva, coding tools, Keynote, PowerPoint, Word, Pages and Preview.
-- Checks installed apps and when they were last opened, Claude Code MCP servers, and the `claude` and `codex` command-line tools.
-- Suggests, coaches or stays quiet for each of the eight areas, respecting free-only, "not for me" and your main AI app.
-- Shows at most one card a day by default, holds cards during calls and pauses, and brings back cards you pushed to "Later".
-- Installs apps with Homebrew, adds the Figma MCP server to Claude Code, or opens the right page, then shows a short walkthrough.
-- Keeps a log of what happened to each card, and notices when you reopen a tool within a week of setting it up.
-- Has onboarding, settings, a pause button and a coverage view in the menu bar.
-- Ships three demos: the full-screen student demo, a side-window version of it, and a demo mode of the real app. The full-screen demo also builds into a web walkthrough.
+- It shows up at the moment of need, so the tool is tied to something you're about to do. That's when people are actually willing to try something new.
+- It coaches you on what you already own before suggesting anything new. A lot of students already have the right tool and just never learned when to use it, and many won't add another app.
+- It does the setup and gives you a walkthrough for that exact task, so the first try goes well and doesn't push you back to doing it by hand.
+- It stays quiet most of the time. One card a day, nothing during calls, and "Not for me" sticks. If it interrupted all the time, people would turn it off.
+- Everything personal stays on your Mac. Event titles are read by Apple's on-device model, and every card says what the tool can see. Nothing about you is uploaded.
 
-## Limitations
+## Planned system architecture
 
-- The catalog is hand-made. The daily service that would gather, test and score new tools isn't built, so the 29 tools were picked and scored by hand. Their facts were checked once, on Oct 15, 2026, and prices and plans will drift. One thing couldn't be confirmed: whether Claude's Learning style is still available to regular accounts.
-- The app only sees calendars that are added to macOS Calendar. A Google or Outlook calendar has to be added in System Settings first.
-- Websites and features inside other apps, like ChatGPT study mode, only count if you tick them in onboarding. "Unused" relies on when macOS last saw an app opened, which can be wrong.
-- App-switching detection watches a short list of apps and counts switches. By design it doesn't read window titles or the screen.
-- Apple's model needs an M1 or later Mac with Apple Intelligence on. Other Macs fall back to keyword rules, which miss titles like "Coffee w/ Yale alum at BCG". Apple's model sometimes misreads a title too, so a few clear keywords like "interview" override it.
-- Tools that need you to sign in, like claude.ai connectors or a Google account, still need you to do that part yourself. In real mode, "Install it for me" really installs apps through Homebrew.
-- It doesn't learn yet. The log stays on your Mac. Sharing results to improve the scores, and suggesting you remove tools you never use, are designed but not built.
-- It isn't signed or notarized for sharing as a download, so each person builds it from source on their own Mac. The web walkthrough is how to show it to anyone else.
-- It has been tested on one Mac, an M4 Pro on macOS 27. A self-test checks the decision flow, and every step of the demos was played through and checked as images.
-- In the demos, the decisions are made live by the real app, but the students, their apps and their calendars are made up.
+The full system diagram is on the [FigJam board](https://www.figma.com/board/DanmId5kR63iVwQ1qfaFuu/Product-System-Diagram?node-id=0-1&t=M3LBlZ7thfZx55GX-1). The full design has three parts.
 
-## For developers
+1. The student's Mac. This is where everything personal lives. It notices moments, checks which tools you have, decides whether to suggest, coach or stay quiet, shows the card, runs the setup and keeps the log. None of that data leaves the Mac.
+2. A shared catalog service in the cloud. Once a day it gathers new AI tools and features from launch feeds, product changelogs and vendor pages. It pulls out facts like price and permissions, tests each tool hands-on, scores how well it fits each kind of moment, and writes the setup steps. A person reviews the result before it goes out. Every Mac downloads the same public catalog, so the service never needs to know anything about you.
+3. An opt-in feedback loop. If you allow it, your Mac sends back only which tool was suggested, whether you set it up and whether you came back to it within a week. No calendar, files or content. That helps the catalog score tools better for everyone.
 
-The code is a Swift package in `Sources/Recommender`. The main pieces are:
+The design also leaves room for an optional private cloud model for harder decisions. It would run in a sealed environment that keeps no logs and that we can't read.
 
-| File | What it does |
-| --- | --- |
-| `Sensing.swift` | Calendar and active-app sensing, and the inventory of what's installed |
-| `MomentDetector.swift` | Apple's on-device model and the keyword rules |
-| `GapEngine.swift` | The suggest, coach or stay quiet decision for each area |
-| `AppModel.swift` | Scheduling, card actions and the log |
-| `PanelViews.swift`, `MenuView.swift`, `OnboardingView.swift`, `SettingsViews.swift` | The card, menu, onboarding and settings |
-| `Personas.swift`, `PersonaViews.swift` | The pretend students and the side-window demo |
-| `StageDirector.swift`, `StageView.swift`, `StageWindows.swift` | The full-screen demo |
+## What the proof of concept covers
 
-There are four testing flags. Run them with `RECOMMENDER_DATA_DIR` set to a scratch folder so your real settings aren't touched.
-
-- `--selftest` prints what the app sees on your Mac, how Apple's model reads 19 sample titles, and what it would decide for each sample moment. It then clicks through the card flow in code and checks 18 things.
-- `--persona-test` plays every student's day and prints each decision.
-- `--stage-test --render <folder>` plays the full-screen demo and saves every step as an image. Add `--clean` to leave out the presenter notes and key hints, as the web walkthrough does.
-- `--snapshot <folder>` saves every screen of the real app as an image, in light and dark mode.
-
-For example:
-
-```bash
-RECOMMENDER_DATA_DIR="$TMPDIR/coach-test" "$HOME/Library/Developer/Background AI Coach/Background AI Coach.app/Contents/MacOS/Recommender" --selftest
-```
-
-Build files stay out of the repo, in `~/Library/Developer/Background AI Coach`. Set `RECOMMENDER_BUILD_DIR` to use another folder.
+- It builds the Mac half of the design. The daily catalog service isn't built yet. In its place is a hand-picked catalog of 31 tools across the eight areas, with prices, plans and links checked against vendor pages on Oct 15, 2026. Some of those will have changed since.
+- The feedback loop and the private cloud model are designed but not built.
+- It has been tested on one Mac. It isn't signed or notarized, so it isn't set up for anyone else to install. The demo is the way to try it.
+- A next version that also notices how you work, if you turn it on, is in progress on the `screen-aware` branch. It reads the title of the window you're in and takes an occasional look at the window itself, all on your Mac, then suggests better ways to use apps you already have.

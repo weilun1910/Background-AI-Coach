@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>edu.yale.enas3110.recommender</string>
+	<string>com.weilun1910.background-ai-coach</string>
 	<key>CFBundleName</key>
 	<string>Background AI Coach</string>
 	<key>CFBundleDisplayName</key>
@@ -27,6 +27,6 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Reads event titles and times on this Mac to notice meetings, interviews and deadlines. Nothing about your calendar leaves this Mac.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>ENAS 3110 prototype</string>
+	<string>Proof of concept by Felix Lee</string>
 </dict>
 </plist>

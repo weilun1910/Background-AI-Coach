@@ -229,7 +229,7 @@ function renderHome() {
             ${saved.finished.includes(p.id) ? `<span class="done">Done</span>` : ""}
           </button>`).join("")}
       </div>
-      <p class="footnote">Made by Felix Lee for ENAS 3110 at Yale. The students are made up, and each mixes patterns from several of our interviews. Nothing you click here leaves your browser until you send the survey.</p>
+      <p class="footnote">A proof of concept by Felix Lee. The students are made up, and each mixes patterns from several of our interviews. Nothing you click here leaves your browser until you send the survey.</p>
     </main>`;
   app.querySelectorAll(".person").forEach((el) =>
     el.addEventListener("click", () => start(people.find((p) => p.id === el.dataset.id))),

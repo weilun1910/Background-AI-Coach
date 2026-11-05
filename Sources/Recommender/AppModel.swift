@@ -464,7 +464,7 @@ final class AppModel: ObservableObject {
         DemoMoment(id: "coffee", label: "Coffee chat in 15 min", title: "Coffee chat w/ Priya (Goldman Sachs)", when: .minutes(15)),
         DemoMoment(id: "interview", label: "Mock interview tomorrow", title: "OCS mock interview", when: .tomorrowAt(10)),
         DemoMoment(id: "exam", label: "Midterm in two days", title: "ECON 1150 midterm", when: .inDays(2, hour: 9)),
-        DemoMoment(id: "presentation", label: "Group presentation in 25 min", title: "ENAS 3110 team presentation", when: .minutes(25)),
+        DemoMoment(id: "presentation", label: "Group presentation in 25 min", title: "Group project presentation", when: .minutes(25)),
         DemoMoment(id: "deadline", label: "Application due tomorrow", title: "McKinsey BA application due", when: .tomorrowAt(17)),
         DemoMoment(id: "reading", label: "Seminar readings tomorrow", title: "Seminar readings (3 papers)", when: .tomorrowAt(14)),
         DemoMoment(id: "figma", label: "Going back and forth to Figma", title: "Figma", when: .app(.design, "You've switched to Figma 4 times in the last 15 minutes.")),
